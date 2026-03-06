@@ -17,7 +17,8 @@ from uwlab_assets.robots.franka_xhand import FRANKA_XHAND_CFG
 
 @configclass
 class FrankaXHandActionCfg:
-    action = mdp.RelativeJointPositionActionCfg(asset_name="robot", joint_names=[".*"], scale=0.1)
+    arm = mdp.RelativeJointPositionActionCfg(asset_name="robot", joint_names=["panda_joint.*"], scale=0.1)
+    hand = mdp.RelativeJointPositionActionCfg(asset_name="robot", joint_names=["right_hand_.*"], scale=1.0)
 
 
 @configclass
