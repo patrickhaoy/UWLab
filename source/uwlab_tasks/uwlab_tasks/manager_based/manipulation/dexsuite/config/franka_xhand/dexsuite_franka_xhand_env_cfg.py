@@ -18,7 +18,7 @@ from uwlab_assets.robots.franka_xhand import FRANKA_XHAND_CFG
 @configclass
 class FrankaXHandActionCfg:
     arm = mdp.RelativeJointPositionActionCfg(asset_name="robot", joint_names=["panda_joint.*"], scale=0.1)
-    hand = mdp.RelativeJointPositionActionCfg(asset_name="robot", joint_names=["right_hand_.*"], scale=1.0)
+    hand = mdp.RelativeJointPositionActionCfg(asset_name="robot", joint_names=["right_hand_.*"], scale=0.1)
 
 
 @configclass
@@ -30,14 +30,14 @@ class FrankaXHandReorientRewardCfg(dexsuite.RewardsCfg):
     )
 
 
-# Mapping from Allegro sensor attribute names (hardcoded in isaaclab's contacts() reward)
-# to actual XHand fingertip prim paths. The scene attribute names must match what the
-# upstream reward function expects; only the prim_path matters for physics.
+# Mapping from Allegro sensor names (hardcoded in contacts() reward) to XHand link
+# bodies that have CollisionAPI. The *_tip prims are visual-only (no colliders), so
+# we use the parent *_link2 bodies which are the last links with collision geometry.
 _CONTACT_SENSOR_MAP = {
-    "thumb_link_3_object_s": "right_hand/right_hand_thumb_rota_tip",
-    "index_link_3_object_s": "right_hand/right_hand_index_rota_tip",
-    "middle_link_3_object_s": "right_hand/right_hand_mid_tip",
-    "ring_link_3_object_s": "right_hand/right_hand_ring_tip",
+    "thumb_link_3_object_s": "right_hand/right_hand_thumb_rota_link2",
+    "index_link_3_object_s": "right_hand/right_hand_index_rota_link2",
+    "middle_link_3_object_s": "right_hand/right_hand_mid_link2",
+    "ring_link_3_object_s": "right_hand/right_hand_ring_link2",
 }
 
 
