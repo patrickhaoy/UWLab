@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING
 import isaaclab.utils.math as math_utils
 from isaaclab.assets import Articulation, RigidObject
 from isaaclab.managers import ManagerTermBase, RewardTermCfg, SceneEntityCfg
+from isaaclab.sensors import ContactSensor
 
 from ..assembly_keypoints import Offset
 from . import utils
@@ -215,3 +216,47 @@ class collision_free(ManagerTermBase):
         collision_free = self.collision_analyzer(env, all_env_ids)
 
         return collision_free
+
+
+# ---------------------------------------------------------------------------
+# DexSuite-style reward functions
+# ---------------------------------------------------------------------------
+
+
+def gripper_contact(env: ManagerBasedRLEnv, threshold: float = 1.0) -> torch.Tensor:
+    """Returns 1.0 when both gripper fingers are in contact with the insertive object.
+
+    Uses the left/right inner finger contact sensors (filtered against InsertiveObject).
+    """
+    right_sensor: ContactSensor = env.scene.sensors["right_inner_finger_contact_sensor"]
+    left_sensor: ContactSensor = env.scene.sensors["left_inner_finger_contact_sensor"]
+
+    right_force = right_sensor.data.force_matrix_w.view(env.num_envs, 3)
+    left_force = left_sensor.data.force_matrix_w.view(env.num_envs, 3)
+
+    right_mag = torch.norm(right_force, dim=-1)
+    left_mag = torch.norm(left_force, dim=-1)
+
+    both_in_contact = (right_mag > threshold) & (left_mag > threshold)
+    return both_in_contact.float()
+
+
+def dense_success_reward_contact_gated(
+    env: ManagerBasedRLEnv, std: float, context: str = "progress_context"
+) -> torch.Tensor:
+    """Dense success reward (position + orientation tracking) gated by gripper contact.
+
+    Only provides reward when both fingers are in contact with the object,
+    following DexSuite's contact-gated tracking pattern.
+    """
+    context_term: ManagerTermBase = env.reward_manager.get_term_cfg(context).func  # type: ignore
+    angle_diff: torch.Tensor = getattr(context_term, "euler_xy_distance")
+    xyz_distance: torch.Tensor = getattr(context_term, "xyz_distance")
+
+    angle_diff = torch.exp(-angle_diff / std)
+    xyz_distance = torch.exp(-xyz_distance / std)
+    stacked = torch.stack([angle_diff, xyz_distance], dim=0)
+    dense = torch.mean(stacked, dim=0)
+
+    contact = gripper_contact(env, threshold=1.0)
+    return dense * contact

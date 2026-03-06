@@ -9,6 +9,7 @@ import isaaclab.utils.math as math_utils
 from isaaclab.assets import Articulation, RigidObject
 from isaaclab.envs import ManagerBasedEnv, ManagerBasedRLEnv
 from isaaclab.managers import ManagerTermBase, ObservationTermCfg, SceneEntityCfg
+from isaaclab.sensors import ContactSensor
 
 from uwlab_tasks.manager_based.manipulation.reset_states.assembly_keypoints import Offset
 from uwlab_tasks.manager_based.manipulation.reset_states.mdp import utils
@@ -199,3 +200,125 @@ def time_left(env) -> torch.Tensor:
     else:
         life_left = torch.zeros(env.num_envs, device=env.device, dtype=torch.float)
     return life_left.view(-1, 1)
+
+
+# ---------------------------------------------------------------------------
+# Tactile / contact observation helpers
+# ---------------------------------------------------------------------------
+
+
+def _get_episode_start_mask(env: ManagerBasedRLEnv) -> torch.Tensor:
+    """Returns 0 at timestep 0 (force data may be stale), 1 otherwise. Shape: (num_envs, 1)."""
+    return (env.episode_length_buf > 0).float().unsqueeze(-1)
+
+
+def _contact_binary(force: torch.Tensor, threshold: float) -> torch.Tensor:
+    """Binary contact flag from force vector. Shape: (num_envs, 1)."""
+    return (torch.norm(force, dim=-1, keepdim=True) > threshold).float()
+
+
+def _normalize_force_direction(force: torch.Tensor) -> torch.Tensor:
+    """Unit direction of force; zero when no contact. Shape matches input."""
+    norm = torch.norm(force, dim=-1, keepdim=True).clamp(min=1e-8)
+    return force / norm
+
+
+def fingertip_contact_force_b(
+    env: ManagerBasedRLEnv,
+    contact_sensor_name: str,
+    root_asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
+    root_body_name: str = "robotiq_base_link",
+) -> torch.Tensor:
+    """Contact force from a fingertip sensor in the gripper body frame. Shape: (num_envs, 3)."""
+    root_asset: Articulation = env.scene[root_asset_cfg.name]
+    root_body_idx = root_asset.body_names.index(root_body_name)
+    root_quat_w = root_asset.data.body_link_quat_w[:, root_body_idx].view(-1, 4)
+
+    contact_sensor: ContactSensor = env.scene.sensors[contact_sensor_name]
+    force_w = contact_sensor.data.force_matrix_w.view(env.num_envs, 3)
+    force_b = math_utils.quat_apply_inverse(root_quat_w, force_w)
+    return force_b
+
+
+def fingertip_contact_binary(
+    env: ManagerBasedRLEnv,
+    contact_sensor_name: str,
+    root_asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
+    root_body_name: str = "robotiq_base_link",
+    threshold: float = 1e-7,
+) -> torch.Tensor:
+    """Binary contact detection for a fingertip. Shape: (num_envs, 1).
+
+    Returns 0 at episode start (timestep 0) since force data may be stale.
+    """
+    force_b = fingertip_contact_force_b(env, contact_sensor_name, root_asset_cfg, root_body_name)
+    result = _contact_binary(force_b, threshold)
+    return result * _get_episode_start_mask(env)
+
+
+def fingertip_contact_direction(
+    env: ManagerBasedRLEnv,
+    contact_sensor_name: str,
+    root_asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
+    root_body_name: str = "robotiq_base_link",
+) -> torch.Tensor:
+    """Normalized contact direction from a fingertip in body frame. Shape: (num_envs, 3).
+
+    Returns 0 at episode start (timestep 0) since force data may be stale.
+    """
+    force_b = fingertip_contact_force_b(env, contact_sensor_name, root_asset_cfg, root_body_name)
+    result = _normalize_force_direction(force_b)
+    return result * _get_episode_start_mask(env)
+
+
+# ---------------------------------------------------------------------------
+# Object point cloud observation
+# ---------------------------------------------------------------------------
+
+
+class object_point_cloud_b(ManagerTermBase):
+    """Object surface point cloud expressed in a reference asset's root frame.
+
+    Points are pre-sampled on the object surface in local frame at init,
+    then transformed to world and into the reference frame each step.
+    """
+
+    def __init__(self, cfg: ObservationTermCfg, env: ManagerBasedRLEnv):
+        super().__init__(cfg, env)
+
+        self.object_cfg: SceneEntityCfg = cfg.params.get("object_cfg", SceneEntityCfg("object"))
+        self.ref_asset_cfg: SceneEntityCfg = cfg.params.get("ref_asset_cfg", SceneEntityCfg("robot"))
+        num_points: int = cfg.params.get("num_points", 10)
+        self.object: RigidObject = env.scene[self.object_cfg.name]
+        self.ref_asset: Articulation = env.scene[self.ref_asset_cfg.name]
+
+        self.points_local = utils.sample_object_point_cloud(
+            env.num_envs,
+            num_points,
+            self.object.cfg.prim_path,
+            device=env.device,
+        )
+        self.points_w = torch.zeros_like(self.points_local) if self.points_local is not None else None
+
+    def __call__(
+        self,
+        env: ManagerBasedRLEnv,
+        ref_asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
+        object_cfg: SceneEntityCfg = SceneEntityCfg("object"),
+        num_points: int = 10,
+        flatten: bool = False,
+    ) -> torch.Tensor:
+        if self.points_local is None:
+            shape = (env.num_envs, num_points * 3) if flatten else (env.num_envs, num_points, 3)
+            return torch.zeros(shape, device=env.device)
+
+        ref_pos_w = self.ref_asset.data.root_pos_w.unsqueeze(1).expand(-1, num_points, -1)
+        ref_quat_w = self.ref_asset.data.root_quat_w.unsqueeze(1).expand(-1, num_points, -1)
+
+        object_pos_w = self.object.data.root_pos_w.unsqueeze(1).expand(-1, num_points, -1)
+        object_quat_w = self.object.data.root_quat_w.unsqueeze(1).expand(-1, num_points, -1)
+
+        self.points_w = math_utils.quat_apply(object_quat_w, self.points_local) + object_pos_w
+        points_b, _ = math_utils.subtract_frame_transforms(ref_pos_w, ref_quat_w, self.points_w, None)
+
+        return points_b.view(env.num_envs, -1) if flatten else points_b

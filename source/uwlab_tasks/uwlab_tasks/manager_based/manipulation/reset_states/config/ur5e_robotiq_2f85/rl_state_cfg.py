@@ -18,6 +18,7 @@ from isaaclab.managers import RewardTermCfg as RewTerm
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.managers import TerminationTermCfg as DoneTerm
 from isaaclab.scene import InteractiveSceneCfg
+from isaaclab.sensors import ContactSensorCfg
 from isaaclab.utils import configclass
 from isaaclab.utils.assets import ISAAC_NUCLEUS_DIR
 
@@ -42,12 +43,16 @@ from ... import mdp as task_mdp
 class RlStateSceneCfg(InteractiveSceneCfg):
     """Scene configuration for RL state environment."""
 
-    robot = EXPLICIT_UR5E_ROBOTIQ_2F85.replace(prim_path="{ENV_REGEX_NS}/Robot")
+    robot = EXPLICIT_UR5E_ROBOTIQ_2F85.replace(
+        prim_path="{ENV_REGEX_NS}/Robot",
+        spawn=EXPLICIT_UR5E_ROBOTIQ_2F85.spawn.replace(activate_contact_sensors=True),
+    )
 
     insertive_object: RigidObjectCfg = RigidObjectCfg(
         prim_path="{ENV_REGEX_NS}/InsertiveObject",
         spawn=sim_utils.UsdFileCfg(
             usd_path=f"{UWLAB_CLOUD_ASSETS_DIR}/Props/Custom/Peg/peg.usd",
+            activate_contact_sensors=True,
             scale=(1, 1, 1),
             rigid_props=sim_utils.RigidBodyPropertiesCfg(
                 solver_position_iteration_count=4,
@@ -64,6 +69,7 @@ class RlStateSceneCfg(InteractiveSceneCfg):
         prim_path="{ENV_REGEX_NS}/ReceptiveObject",
         spawn=sim_utils.UsdFileCfg(
             usd_path=f"{UWLAB_CLOUD_ASSETS_DIR}/Props/Custom/PegHole/peg_hole.usd",
+            activate_contact_sensors=True,
             scale=(1, 1, 1),
             rigid_props=sim_utils.RigidBodyPropertiesCfg(
                 solver_position_iteration_count=4,
@@ -95,6 +101,22 @@ class RlStateSceneCfg(InteractiveSceneCfg):
             usd_path=f"{UWLAB_CLOUD_ASSETS_DIR}/Props/Mounts/UWPatVention2/Ur5MetalSupport/ur5plate.usd",
             rigid_props=sim_utils.RigidBodyPropertiesCfg(kinematic_enabled=True),
         ),
+    )
+
+    right_inner_finger_contact_sensor = ContactSensorCfg(
+        prim_path="{ENV_REGEX_NS}/Robot/right_inner_finger",
+        update_period=0.0,
+        history_length=6,
+        debug_vis=False,
+        filter_prim_paths_expr=["{ENV_REGEX_NS}/InsertiveObject"],
+    )
+
+    left_inner_finger_contact_sensor = ContactSensorCfg(
+        prim_path="{ENV_REGEX_NS}/Robot/left_inner_finger",
+        update_period=0.0,
+        history_length=6,
+        debug_vis=False,
+        filter_prim_paths_expr=["{ENV_REGEX_NS}/InsertiveObject"],
     )
 
     ground = AssetBaseCfg(
@@ -461,6 +483,36 @@ class ObservationsCfg:
             },
         )
 
+        right_finger_contact_binary = ObsTerm(
+            func=task_mdp.fingertip_contact_binary,
+            params={
+                "contact_sensor_name": "right_inner_finger_contact_sensor",
+                "root_asset_cfg": SceneEntityCfg("robot"),
+                "root_body_name": "robotiq_base_link",
+                "threshold": 5.0,
+            },
+        )
+
+        left_finger_contact_binary = ObsTerm(
+            func=task_mdp.fingertip_contact_binary,
+            params={
+                "contact_sensor_name": "left_inner_finger_contact_sensor",
+                "root_asset_cfg": SceneEntityCfg("robot"),
+                "root_body_name": "robotiq_base_link",
+                "threshold": 5.0,
+            },
+        )
+
+        insertive_object_point_cloud = ObsTerm(
+            func=task_mdp.object_point_cloud_b,
+            params={
+                "object_cfg": SceneEntityCfg("insertive_object"),
+                "ref_asset_cfg": SceneEntityCfg("robot"),
+                "num_points": 64,
+                "flatten": True,
+            },
+        )
+
         def __post_init__(self):
             self.enable_corruption = False
             self.concatenate_terms = True
@@ -510,6 +562,36 @@ class ObservationsCfg:
                 "target_asset_cfg": SceneEntityCfg("insertive_object"),
                 "root_asset_cfg": SceneEntityCfg("receptive_object"),
                 "rotation_repr": "axis_angle",
+            },
+        )
+
+        right_finger_contact_binary = ObsTerm(
+            func=task_mdp.fingertip_contact_binary,
+            params={
+                "contact_sensor_name": "right_inner_finger_contact_sensor",
+                "root_asset_cfg": SceneEntityCfg("robot"),
+                "root_body_name": "robotiq_base_link",
+                "threshold": 5.0,
+            },
+        )
+
+        left_finger_contact_binary = ObsTerm(
+            func=task_mdp.fingertip_contact_binary,
+            params={
+                "contact_sensor_name": "left_inner_finger_contact_sensor",
+                "root_asset_cfg": SceneEntityCfg("robot"),
+                "root_body_name": "robotiq_base_link",
+                "threshold": 5.0,
+            },
+        )
+
+        insertive_object_point_cloud = ObsTerm(
+            func=task_mdp.object_point_cloud_b,
+            params={
+                "object_cfg": SceneEntityCfg("insertive_object"),
+                "ref_asset_cfg": SceneEntityCfg("robot"),
+                "num_points": 64,
+                "flatten": True,
             },
         )
 
@@ -577,45 +659,56 @@ class ObservationsCfg:
 @configclass
 class RewardsCfg:
 
-    # safety rewards
-
-    action_magnitude = RewTerm(func=task_mdp.action_l2_clamped, weight=-1e-4)
-
-    action_rate = RewTerm(func=task_mdp.action_rate_l2_clamped, weight=-1e-4)
-
-    joint_vel = RewTerm(
-        func=task_mdp.joint_vel_l2_clamped,
-        weight=-1e-3,
-        params={"asset_cfg": SceneEntityCfg("robot", joint_names=["shoulder.*", "elbow.*", "wrist.*"])},
-    )
-
-    abnormal_robot = RewTerm(func=task_mdp.abnormal_robot_state, weight=-100.0)
-
-    # task rewards
-
+    # internal tracker (weight=0 so it runs but doesn't contribute reward)
     progress_context = RewTerm(
         func=task_mdp.ProgressContext,  # type: ignore
-        weight=0.1,
+        weight=0.0,
         params={
             "insertive_asset_cfg": SceneEntityCfg("insertive_object"),
             "receptive_asset_cfg": SceneEntityCfg("receptive_object"),
         },
     )
 
+    # reach: EE-to-object distance
     ee_asset_distance = RewTerm(
         func=task_mdp.ee_asset_distance_tanh,
-        weight=0.1,
+        weight=1.0,
         params={
             "root_asset_cfg": SceneEntityCfg("robot", body_names="robotiq_base_link"),
             "target_asset_cfg": SceneEntityCfg("insertive_object"),
             "root_asset_offset_metadata_key": "gripper_offset",
-            "std": 1.0,
+            "std": 0.4,
         },
     )
 
-    dense_success_reward = RewTerm(func=task_mdp.dense_success_reward, weight=0.1, params={"std": 1.0})
+    # task tracking (contact-gated)
+    dense_success_reward = RewTerm(
+        func=task_mdp.dense_success_reward_contact_gated,
+        weight=2.0,
+        params={"std": 1.0},
+    )
 
-    success_reward = RewTerm(func=task_mdp.success_reward, weight=1.0)
+    # success
+    success_reward = RewTerm(func=task_mdp.success_reward, weight=10.0)
+
+    # contact: reward both fingers gripping the object
+    good_finger_contact = RewTerm(
+        func=task_mdp.gripper_contact,
+        weight=0.5,
+        params={"threshold": 1.0},
+    )
+
+    # action penalties
+    action_magnitude = RewTerm(func=task_mdp.action_l2_clamped, weight=-0.005)
+
+    action_rate = RewTerm(func=task_mdp.action_rate_l2_clamped, weight=-0.005)
+
+    # early termination penalty
+    early_termination = RewTerm(
+        func=task_mdp.is_terminated_term,
+        weight=-1.0,
+        params={"term_keys": "abnormal_robot"},
+    )
 
 
 @configclass
@@ -632,6 +725,7 @@ def make_insertive_object(usd_path: str):
         prim_path="{ENV_REGEX_NS}/InsertiveObject",
         spawn=sim_utils.UsdFileCfg(
             usd_path=usd_path,
+            activate_contact_sensors=True,
             scale=(1, 1, 1),
             rigid_props=sim_utils.RigidBodyPropertiesCfg(
                 solver_position_iteration_count=4,
@@ -650,6 +744,7 @@ def make_receptive_object(usd_path: str):
         prim_path="{ENV_REGEX_NS}/ReceptiveObject",
         spawn=sim_utils.UsdFileCfg(
             usd_path=usd_path,
+            activate_contact_sensors=True,
             scale=(1, 1, 1),
             rigid_props=sim_utils.RigidBodyPropertiesCfg(
                 solver_position_iteration_count=4,
@@ -739,7 +834,10 @@ class Ur5eRobotiq2f85RelCartesianOSCTrainCfg(Ur5eRobotiq2f85RlStateCfg):
 
     def __post_init__(self):
         super().__post_init__()
-        self.scene.robot = EXPLICIT_UR5E_ROBOTIQ_2F85.replace(prim_path="{ENV_REGEX_NS}/Robot")
+        self.scene.robot = EXPLICIT_UR5E_ROBOTIQ_2F85.replace(
+            prim_path="{ENV_REGEX_NS}/Robot",
+            spawn=EXPLICIT_UR5E_ROBOTIQ_2F85.spawn.replace(activate_contact_sensors=True),
+        )
 
         self.events.randomize_robot_actuator_parameters = EventTerm(
             func=task_mdp.randomize_operational_space_controller_gains,
@@ -763,7 +861,10 @@ class Ur5eRobotiq2f85RelJointPosTrainCfg(Ur5eRobotiq2f85RlStateCfg):
 
     def __post_init__(self):
         super().__post_init__()
-        self.scene.robot = IMPLICIT_UR5E_ROBOTIQ_2F85.replace(prim_path="{ENV_REGEX_NS}/Robot")
+        self.scene.robot = IMPLICIT_UR5E_ROBOTIQ_2F85.replace(
+            prim_path="{ENV_REGEX_NS}/Robot",
+            spawn=IMPLICIT_UR5E_ROBOTIQ_2F85.spawn.replace(activate_contact_sensors=True),
+        )
 
         self.events.randomize_robot_actuator_parameters = EventTerm(
             func=task_mdp.randomize_actuator_gains,
@@ -789,7 +890,10 @@ class Ur5eRobotiq2f85RelCartesianOSCEvalCfg(Ur5eRobotiq2f85RlStateCfg):
 
     def __post_init__(self):
         super().__post_init__()
-        self.scene.robot = EXPLICIT_UR5E_ROBOTIQ_2F85.replace(prim_path="{ENV_REGEX_NS}/Robot")
+        self.scene.robot = EXPLICIT_UR5E_ROBOTIQ_2F85.replace(
+            prim_path="{ENV_REGEX_NS}/Robot",
+            spawn=EXPLICIT_UR5E_ROBOTIQ_2F85.spawn.replace(activate_contact_sensors=True),
+        )
 
         self.events.randomize_robot_actuator_parameters = EventTerm(
             func=task_mdp.randomize_operational_space_controller_gains,
@@ -814,7 +918,10 @@ class Ur5eRobotiq2f85RelJointPosEvalCfg(Ur5eRobotiq2f85RlStateCfg):
 
     def __post_init__(self):
         super().__post_init__()
-        self.scene.robot = IMPLICIT_UR5E_ROBOTIQ_2F85.replace(prim_path="{ENV_REGEX_NS}/Robot")
+        self.scene.robot = IMPLICIT_UR5E_ROBOTIQ_2F85.replace(
+            prim_path="{ENV_REGEX_NS}/Robot",
+            spawn=IMPLICIT_UR5E_ROBOTIQ_2F85.spawn.replace(activate_contact_sensors=True),
+        )
 
         self.events.randomize_robot_actuator_parameters = EventTerm(
             func=task_mdp.randomize_actuator_gains,
