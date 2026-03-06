@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import numpy as np
 from dataclasses import MISSING
 
 import isaaclab.sim as sim_utils
@@ -29,6 +30,9 @@ from uwlab_assets.robots.ur5e_robotiq_gripper import (
 
 from uwlab_tasks.manager_based.manipulation.reset_states.config.ur5e_robotiq_2f85.actions import (
     Ur5eRobotiq2f85RelativeOSCAction,
+)
+from uwlab_tasks.manager_based.manipulation.reset_states.config.ur5e_robotiq_2f85.curriculum_cfg import (
+    CurriculumCfg,
 )
 
 from ... import mdp as task_mdp
@@ -243,40 +247,151 @@ class BaseEventCfg:
     # mode: reset
     reset_everything = EventTerm(func=task_mdp.reset_scene_to_default, mode="reset", params={})
 
-
-@configclass
-class TrainEventCfg(BaseEventCfg):
-    """Configuration for training events."""
-
-    reset_from_reset_states = EventTerm(
-        func=task_mdp.MultiResetManager,
+    variable_gravity = EventTerm(
+        func=task_mdp.randomize_physics_scene_gravity,
         mode="reset",
         params={
-            "base_paths": [
-                f"{UWLAB_CLOUD_ASSETS_DIR}/Datasets/Resets/ObjectPairs/ObjectAnywhereEEAnywhere",
-                f"{UWLAB_CLOUD_ASSETS_DIR}/Datasets/Resets/ObjectPairs/ObjectRestingEEGrasped",
-                f"{UWLAB_CLOUD_ASSETS_DIR}/Datasets/Resets/ObjectPairs/ObjectAnywhereEEGrasped",
-                f"{UWLAB_CLOUD_ASSETS_DIR}/Datasets/Resets/ObjectPairs/ObjectPartiallyAssembledEEGrasped",
-            ],
-            "probs": [0.25, 0.25, 0.25, 0.25],
-            "success": "env.reward_manager.get_term_cfg('progress_context').func.success",
+            "gravity_distribution_params": ([0.0, 0.0, 0.0], [0.0, 0.0, 0.0]),
+            "operation": "abs",
+        },
+    )
+
+    reset_robot_pose = EventTerm(
+        func=task_mdp.reset_root_states_uniform,
+        mode="reset",
+        params={
+            "pose_range": {
+                "x": (-0.01, 0.01),
+                "y": (-0.059, -0.019),
+                "z": (-0.01, 0.01),
+                "roll": (0.0, 0.0),
+                "pitch": (0.0, 0.0),
+                "yaw": (0.0, 0.0),
+            },
+            "velocity_range": {},
+            "asset_cfgs": {"robot": SceneEntityCfg("robot"), "ur5_metal_support": SceneEntityCfg("ur5_metal_support")},
+        },
+    )
+
+    reset_receptive_object_pose = EventTerm(
+        func=task_mdp.reset_root_states_uniform,
+        mode="reset",
+        params={
+            "pose_range": {
+                "x": (0.3, 0.55),
+                "y": (-0.1, 0.3),
+                "z": (0.0, 0.001),
+                "roll": (0.0, 0.0),
+                "pitch": (0.0, 0.0),
+                "yaw": (-np.pi / 12, np.pi / 12),
+            },
+            "velocity_range": {},
+            "asset_cfgs": {"receptive_object": SceneEntityCfg("receptive_object")},
+            "offset_asset_cfg": SceneEntityCfg("ur5_metal_support"),
+            "use_bottom_offset": True,
+        },
+    )
+
+    reset_insertive_object = EventTerm(
+        func=task_mdp.InlineInsertiveObjectReset,
+        mode="reset",
+        params={
+            "prob_partial_assembly": 0.5,
+            "max_difficulty_frac": 0.1,
+            "uniform_params": {
+                "pose_range": {
+                    "x": (0.3, 0.55),
+                    "y": (-0.1, 0.5),
+                    "z": (0.0, 0.3),
+                    "roll": (-np.pi, np.pi),
+                    "pitch": (-np.pi, np.pi),
+                    "yaw": (-np.pi, np.pi),
+                },
+                "velocity_range": {},
+                "asset_cfgs": {"insertive_object": SceneEntityCfg("insertive_object")},
+                "offset_asset_cfg": SceneEntityCfg("ur5_metal_support"),
+                "use_bottom_offset": True,
+            },
+            "partial_assembly_params": {
+                "base_path": f"{UWLAB_CLOUD_ASSETS_DIR}/Datasets/PartialAssemblies/ObjectPairs",
+                "insertive_object_cfg": SceneEntityCfg("insertive_object"),
+                "receptive_object_cfg": SceneEntityCfg("receptive_object"),
+            },
+        },
+    )
+
+    reset_end_effector_pose = EventTerm(
+        func=task_mdp.reset_end_effector_round_fixed_asset,
+        mode="reset",
+        params={
+            "fixed_asset_cfg": SceneEntityCfg("robot"),
+            "fixed_asset_offset": None,
+            "pose_range_b": {
+                "x": (0.3, 0.7),
+                "y": (-0.4, 0.4),
+                "z": (0.0, 0.5),
+                "roll": (0.0, 0.0),
+                "pitch": (np.pi / 4, 3 * np.pi / 4),
+                "yaw": (np.pi / 2, 3 * np.pi / 2),
+            },
+            "robot_ik_cfg": SceneEntityCfg(
+                "robot", joint_names=["shoulder.*", "elbow.*", "wrist.*"], body_names="robotiq_base_link"
+            ),
         },
     )
 
 
 @configclass
-class EvalEventCfg(BaseEventCfg):
-    """Configuration for evaluation events."""
+class TrainEventCfg(BaseEventCfg):
+    """Configuration for training events.
 
-    reset_from_reset_states = EventTerm(
-        func=task_mdp.MultiResetManager,
+    Inherits all inline resets and gravity curriculum from BaseEventCfg.
+    """
+
+    pass
+
+
+@configclass
+class EvalEventCfg(BaseEventCfg):
+    """Configuration for evaluation events.
+
+    Uses full gravity and full partial assembly dataset range (no curriculum).
+    """
+
+    variable_gravity = EventTerm(
+        func=task_mdp.randomize_physics_scene_gravity,
         mode="reset",
         params={
-            "base_paths": [
-                f"{UWLAB_CLOUD_ASSETS_DIR}/Datasets/Resets/ObjectPairs/ObjectAnywhereEEAnywhere",
-            ],
-            "probs": [1.0],
-            "success": "env.reward_manager.get_term_cfg('progress_context').func.success",
+            "gravity_distribution_params": ([0.0, 0.0, -9.81], [0.0, 0.0, -9.81]),
+            "operation": "abs",
+        },
+    )
+
+    reset_insertive_object = EventTerm(
+        func=task_mdp.InlineInsertiveObjectReset,
+        mode="reset",
+        params={
+            "prob_partial_assembly": 0.5,
+            "max_difficulty_frac": 1.0,
+            "uniform_params": {
+                "pose_range": {
+                    "x": (0.3, 0.55),
+                    "y": (-0.1, 0.5),
+                    "z": (0.0, 0.3),
+                    "roll": (-np.pi, np.pi),
+                    "pitch": (-np.pi, np.pi),
+                    "yaw": (-np.pi, np.pi),
+                },
+                "velocity_range": {},
+                "asset_cfgs": {"insertive_object": SceneEntityCfg("insertive_object")},
+                "offset_asset_cfg": SceneEntityCfg("ur5_metal_support"),
+                "use_bottom_offset": True,
+            },
+            "partial_assembly_params": {
+                "base_path": f"{UWLAB_CLOUD_ASSETS_DIR}/Datasets/PartialAssemblies/ObjectPairs",
+                "insertive_object_cfg": SceneEntityCfg("insertive_object"),
+                "receptive_object_cfg": SceneEntityCfg("receptive_object"),
+            },
         },
     )
 
@@ -582,6 +697,7 @@ class Ur5eRobotiq2f85RlStateCfg(ManagerBasedRLEnvCfg):
     rewards: RewardsCfg = RewardsCfg()
     terminations: TerminationsCfg = TerminationsCfg()
     events: BaseEventCfg = MISSING
+    curriculum: CurriculumCfg | None = CurriculumCfg()
     commands: CommandsCfg = CommandsCfg()
     viewer: ViewerCfg = ViewerCfg(eye=(2.0, 0.0, 0.75), origin_type="world", env_index=0, asset_name="robot")
     variants = variants
@@ -668,6 +784,7 @@ class Ur5eRobotiq2f85RelCartesianOSCEvalCfg(Ur5eRobotiq2f85RlStateCfg):
     """Evaluation configuration for Relative Cartesian OSC action space."""
 
     events: EvalEventCfg = EvalEventCfg()
+    curriculum = None
     actions: Ur5eRobotiq2f85RelativeOSCAction = Ur5eRobotiq2f85RelativeOSCAction()
 
     def __post_init__(self):
@@ -692,6 +809,7 @@ class Ur5eRobotiq2f85RelJointPosEvalCfg(Ur5eRobotiq2f85RlStateCfg):
     """Evaluation configuration for Relative Joint Position action space."""
 
     events: EvalEventCfg = EvalEventCfg()
+    curriculum = None
     actions: Ur5eRobotiq2f85RelativeJointPositionAction = Ur5eRobotiq2f85RelativeJointPositionAction()
 
     def __post_init__(self):

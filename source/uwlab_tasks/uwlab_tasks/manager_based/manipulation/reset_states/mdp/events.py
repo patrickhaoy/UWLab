@@ -810,7 +810,11 @@ class reset_insertive_object_from_partial_assembly_dataset(ManagerTermBase):
         return f"{self.base_path}/{object_hash}.pt"
 
     def _load_and_precompute_partial_assemblies(self, env):
-        """Load Torch (.pt) partial assembly data and convert to optimized tensors."""
+        """Load Torch (.pt) partial assembly data and convert to optimized tensors.
+
+        Also computes distance-to-goal for each sample and sorts indices by ascending
+        distance to support curriculum-driven sampling.
+        """
         local_path = retrieve_file_path(self.partial_assembly_dataset_path)
         data = torch.load(local_path, map_location="cpu")
 
@@ -820,7 +824,6 @@ class reset_insertive_object_from_partial_assembly_dataset(ManagerTermBase):
         if rel_pos is None or rel_quat is None or len(rel_pos) == 0:
             raise ValueError(f"No partial assembly data found in {self.partial_assembly_dataset_path}")
 
-        # Tensors were saved via torch.save; ensure proper device/dtype
         if not isinstance(rel_pos, torch.Tensor):
             rel_pos = torch.as_tensor(rel_pos, dtype=torch.float32)
         if not isinstance(rel_quat, torch.Tensor):
@@ -829,9 +832,37 @@ class reset_insertive_object_from_partial_assembly_dataset(ManagerTermBase):
         self.rel_positions = rel_pos.to(env.device, dtype=torch.float32)
         self.rel_quaternions = rel_quat.to(env.device, dtype=torch.float32)
 
+        # Compute distance-to-goal for curriculum sorting
+        insertive_meta = utils.read_metadata_from_usd_directory(self.insertive_object.cfg.spawn.usd_path)
+        receptive_meta = utils.read_metadata_from_usd_directory(self.receptive_object.cfg.spawn.usd_path)
+        i_offset_pos = torch.tensor(insertive_meta.get("assembled_offset").get("pos"), device=env.device)
+        i_offset_quat = torch.tensor(insertive_meta.get("assembled_offset").get("quat"), device=env.device)
+        r_offset_pos = torch.tensor(receptive_meta.get("assembled_offset").get("pos"), device=env.device)
+        r_offset_quat = torch.tensor(receptive_meta.get("assembled_offset").get("quat"), device=env.device)
+
+        n = len(self.rel_positions)
+        # Insertive alignment point in receptive root frame for each sample
+        ins_align_pos, ins_align_quat = math_utils.combine_frame_transforms(
+            self.rel_positions, self.rel_quaternions,
+            i_offset_pos.unsqueeze(0).expand(n, -1), i_offset_quat.unsqueeze(0).expand(n, -1),
+        )
+        # Error relative to receptive alignment point
+        error_pos, error_quat = math_utils.subtract_frame_transforms(
+            r_offset_pos.unsqueeze(0).expand(n, -1), r_offset_quat.unsqueeze(0).expand(n, -1),
+            ins_align_pos, ins_align_quat,
+        )
+        xyz_distance = torch.norm(error_pos, dim=1)
+        e_x, e_y, _ = math_utils.euler_xyz_from_quat(error_quat)
+        euler_xy_distance = math_utils.wrap_to_pi(e_x).abs() + math_utils.wrap_to_pi(e_y).abs()
+        combined_distance = xyz_distance + 0.1 * euler_xy_distance
+
+        self.sorted_indices = torch.argsort(combined_distance)
+
         print(
-            f"Loaded {len(self.rel_positions)} partial assembly tensors from Torch file:"
+            f"Loaded {n} partial assembly tensors from Torch file:"
             f" {self.partial_assembly_dataset_path}"
+            f" (distance range: {combined_distance[self.sorted_indices[0]]:.4f}"
+            f" - {combined_distance[self.sorted_indices[-1]]:.4f})"
         )
 
     def __call__(
@@ -842,15 +873,28 @@ class reset_insertive_object_from_partial_assembly_dataset(ManagerTermBase):
         insertive_object_cfg: SceneEntityCfg,
         receptive_object_cfg: SceneEntityCfg,
         pose_range_b: dict[str, tuple[float, float]] = dict(),
+        max_difficulty_frac: float = 1.0,
+        curriculum_ratio: float = 0.7,
     ) -> None:
-        """Reset the insertive object from a partial assembly dataset."""
-        # Get receptive object pose (world coordinates)
+        """Reset the insertive object from a partial assembly dataset.
+
+        Args:
+            max_difficulty_frac: Fraction of the sorted dataset to use for curriculum sampling (0-1).
+                Controlled by the curriculum manager at training time.
+            curriculum_ratio: Fraction of envs that sample from the curriculum pool vs uniform.
+        """
         receptive_pos_w = self.receptive_object.data.root_pos_w[env_ids]
         receptive_quat_w = self.receptive_object.data.root_quat_w[env_ids]
 
-        # Randomly sample partial assembly indices for each environment
         num_envs = len(env_ids)
-        assembly_indices = torch.randint(0, len(self.rel_positions), (num_envs,), device=env.device)
+        total = len(self.sorted_indices)
+        max_idx = max(1, int(max_difficulty_frac * total))
+        curriculum_pool = self.sorted_indices[:max_idx]
+
+        use_curriculum = torch.rand(num_envs, device=env.device) < curriculum_ratio
+        curriculum_samples = curriculum_pool[torch.randint(0, max_idx, (num_envs,), device=env.device)]
+        uniform_samples = self.sorted_indices[torch.randint(0, total, (num_envs,), device=env.device)]
+        assembly_indices = torch.where(use_curriculum, curriculum_samples, uniform_samples)
 
         # Use pre-computed tensors for sampled partial assemblies
         sampled_rel_positions = self.rel_positions[assembly_indices]
@@ -990,6 +1034,63 @@ class assembly_sampling_event(ManagerTermBase):
             ),
             env_ids=env_ids,
         )
+
+
+class InlineInsertiveObjectReset(ManagerTermBase):
+    """Routes insertive object placement between uniform random and partial assembly modes.
+
+    For each reset, each env_id is assigned to either:
+    - Uniform mode: places insertive object at a random pose (via reset_root_states_uniform)
+    - Partial assembly mode: places from the partial assembly dataset (via
+      reset_insertive_object_from_partial_assembly_dataset)
+
+    The routing probability and partial assembly curriculum parameters are configurable.
+    The ``max_difficulty_frac`` parameter is exposed at the top level so the curriculum
+    manager can modify it via ``modify_term_cfg``.
+    """
+
+    def __init__(self, cfg: EventTermCfg, env: ManagerBasedEnv):
+        super().__init__(cfg, env)
+
+        uniform_event_cfg = EventTermCfg(
+            func=reset_root_states_uniform,
+            mode="reset",
+            params=cfg.params.get("uniform_params"),
+        )
+        self._uniform_reset = reset_root_states_uniform(uniform_event_cfg, env)
+
+        partial_event_cfg = EventTermCfg(
+            func=reset_insertive_object_from_partial_assembly_dataset,
+            mode="reset",
+            params=cfg.params.get("partial_assembly_params"),
+        )
+        self._partial_assembly_reset = reset_insertive_object_from_partial_assembly_dataset(partial_event_cfg, env)
+
+        self._uniform_call_params = cfg.params.get("uniform_params")
+        self._partial_call_params = cfg.params.get("partial_assembly_params")
+
+    def __call__(
+        self,
+        env: ManagerBasedEnv,
+        env_ids: torch.Tensor,
+        uniform_params: dict,
+        partial_assembly_params: dict,
+        prob_partial_assembly: float = 0.5,
+        max_difficulty_frac: float = 1.0,
+    ) -> None:
+        num_envs = len(env_ids)
+        mask = torch.rand(num_envs, device=env.device) < prob_partial_assembly
+
+        uniform_ids = env_ids[~mask]
+        partial_ids = env_ids[mask]
+
+        if len(uniform_ids) > 0:
+            self._uniform_reset(env, uniform_ids, **self._uniform_call_params)
+
+        if len(partial_ids) > 0:
+            self._partial_assembly_reset(
+                env, partial_ids, max_difficulty_frac=max_difficulty_frac, **self._partial_call_params
+            )
 
 
 class MultiResetManager(ManagerTermBase):
