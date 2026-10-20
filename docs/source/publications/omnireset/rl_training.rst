@@ -5,6 +5,12 @@ Collect Resets & Train RL Policy
 
 Reproduce our training results from scratch.
 
+Reset collection saves its first successful batch immediately, then checkpoints at
+most once every 60 seconds and saves all remaining states on completion or Ctrl+C.
+Use ``--save_interval SECONDS`` to change this interval, or ``--save_interval 0``
+to save after every export. A hard termination can lose states collected since the
+last checkpoint. Each checkpoint atomically replaces the previous dataset file.
+
 .. tip::
 
    **Want to try it quickly?** Start with **Cube Stacking** or **Peg Insertion**. They have the fastest reset state collection times and converge within ~8 hours on 4×L40S GPUs.

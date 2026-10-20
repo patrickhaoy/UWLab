@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import os
 import torch
+from functools import partial
 from tqdm import tqdm
 from typing import cast
 
@@ -39,6 +40,12 @@ parser.add_argument(
     "--num_reset_states", type=int, default=100, help="Number of reset states to record. Set to 0 for infinite."
 )
 
+parser.add_argument(
+    "--save_interval",
+    type=float,
+    default=60.0,
+    help="Minimum seconds between checkpoints; 0 saves every export. Always saves on clean exit or Ctrl+C.",
+)
 AppLauncher.add_app_launcher_args(parser)
 args_cli, remaining_args = parser.parse_known_args()
 
@@ -114,7 +121,9 @@ def main(env_cfg, agent_cfg) -> None:
     env_cfg.recorders.dataset_export_dir_path = output_dir
     env_cfg.recorders.dataset_filename = output_file_name
     env_cfg.recorders.dataset_export_mode = DatasetExportMode.EXPORT_SUCCEEDED_ONLY
-    env_cfg.recorders.dataset_file_handler_class_type = TorchDatasetFileHandler
+    env_cfg.recorders.dataset_file_handler_class_type = partial(
+        TorchDatasetFileHandler, flush_interval_s=args_cli.save_interval
+    )
 
     # create environment
     env = cast(ManagerBasedRLEnv, gym.make(args_cli.task, cfg=env_cfg)).unwrapped
@@ -136,47 +145,53 @@ def main(env_cfg, agent_cfg) -> None:
 
     start_time = time.time()
 
-    while current_successful_reset_conditions < args_cli.num_reset_states:
-        # Step environment (this will evaluate grasps in parallel across environments)
-        _, _, terminated, truncated, _ = env.step(actions)
-        dones = terminated | truncated
-        done_idx = torch.where(dones)[0]
+    try:
+        while current_successful_reset_conditions < args_cli.num_reset_states:
+            # Step environment (this will evaluate grasps in parallel across environments)
+            _, _, terminated, truncated, _ = env.step(actions)
+            dones = terminated | truncated
+            done_idx = torch.where(dones)[0]
 
-        # Reset actions for environments that are done
-        if done_idx.numel() > 0 and not (
-            "ObjectAnywhereEEGrasped" in args_cli.task or "ObjectRestingEEGrasped" in args_cli.task
-        ):
-            actions[done_idx, -1] = (
-                torch.randint(0, 2, (done_idx.numel(),), device=env.device, dtype=torch.float32) * 2 - 1
-            )
+            # Reset actions for environments that are done
+            if done_idx.numel() > 0 and not (
+                "ObjectAnywhereEEGrasped" in args_cli.task or "ObjectRestingEEGrasped" in args_cli.task
+            ):
+                actions[done_idx, -1] = (
+                    torch.randint(0, 2, (done_idx.numel(),), device=env.device, dtype=torch.float32) * 2 - 1
+                )
 
-        # Update progress based on successful reset conditions
-        new_successful_count = env.recorder_manager.exported_successful_episode_count
-        if new_successful_count > current_successful_reset_conditions:
-            increment = new_successful_count - current_successful_reset_conditions
-            current_successful_reset_conditions = new_successful_count
-            pbar.update(increment)
+            # Update progress based on successful reset conditions
+            new_successful_count = env.recorder_manager.exported_successful_episode_count
+            if new_successful_count > current_successful_reset_conditions:
+                increment = new_successful_count - current_successful_reset_conditions
+                current_successful_reset_conditions = new_successful_count
+                pbar.update(increment)
 
-        # Count total reset conditions evaluated (sum across all environments)
-        num_reset_conditions_evaluated += dones.sum().item()
+            # Count total reset conditions evaluated (sum across all environments)
+            num_reset_conditions_evaluated += dones.sum().item()
 
-        if env.sim.is_stopped():
-            break
+            if env.sim.is_stopped():
+                break
 
-    pbar.close()
-
-    # Get final statistics
-    final_successful_reset_conditions = env.recorder_manager.exported_successful_episode_count
-    print("Reset state recording complete!")
-    print(f"Total reset conditions evaluated: {num_reset_conditions_evaluated}")
-    print(f"Successful reset conditions: {final_successful_reset_conditions}")
-    if num_reset_conditions_evaluated > 0:
-        print(f"Success rate: {final_successful_reset_conditions / num_reset_conditions_evaluated:.2%}")
-        print(f"Time taken: {(time.time() - start_time) / 60:.2f} minutes")
-
-    env.close()
+        # Get final statistics
+        final_successful_reset_conditions = env.recorder_manager.exported_successful_episode_count
+        print("Reset state recording complete!")
+        print(f"Total reset conditions evaluated: {num_reset_conditions_evaluated}")
+        print(f"Successful reset conditions: {final_successful_reset_conditions}")
+        if num_reset_conditions_evaluated > 0:
+            print(f"Success rate: {final_successful_reset_conditions / num_reset_conditions_evaluated:.2%}")
+            print(f"Time taken: {(time.time() - start_time) / 60:.2f} minutes")
+    finally:
+        pbar.close()
+        try:
+            # Environment teardown does not close the dataset recorder in Isaac Lab 3.
+            env.recorder_manager.close()
+        finally:
+            env.close()
 
 
 if __name__ == "__main__":
-    main()
-    simulation_app.close()
+    try:
+        main()
+    finally:
+        simulation_app.close()

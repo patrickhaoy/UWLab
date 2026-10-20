@@ -10,7 +10,10 @@ This module provides a dataset file handler that saves data directly in the torc
 
 from __future__ import annotations
 
+import math
 import os
+import tempfile
+import time
 import torch
 from collections.abc import Iterable
 from typing import Any
@@ -23,7 +26,17 @@ class TorchDatasetFileHandler(DatasetFileHandlerBase):
     Dataset file handler that saves data directly in torch format as a torch file.
     """
 
-    def __init__(self):
+    def __init__(self, flush_interval_s: float = 0.0):
+        """Limit checkpoint frequency when requested; zero preserves immediate saves.
+
+        The first flush and close always save pending data. Between checkpoints,
+        newly collected states remain in memory.
+        """
+        if not math.isfinite(flush_interval_s) or flush_interval_s < 0:
+            raise ValueError("flush_interval_s must be finite and non-negative")
+        self._flush_interval_s = flush_interval_s
+        self._last_flush_time = -math.inf
+        self._dirty = False
         self._file_path: str | None = None
         self._episode_data: dict[str, Any] = {}
         self._episode_count: int = 0
@@ -33,12 +46,16 @@ class TorchDatasetFileHandler(DatasetFileHandlerBase):
         self._file_path = file_path
         self._episode_data = {}
         self._episode_count = 0
+        self._last_flush_time = -math.inf
+        self._dirty = False
 
         # Ensure directory exists
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
     def open(self, file_path: str, mode: str = "r"):
         """Open an existing dataset file."""
+        self._last_flush_time = -math.inf
+        self._dirty = False
         if mode == "r":
             if os.path.exists(file_path):
                 self._episode_data = torch.load(file_path)
@@ -83,6 +100,7 @@ class TorchDatasetFileHandler(DatasetFileHandlerBase):
 
         # Extract only the last entry from this episode using extend_dicts_last_entry logic
         self._extend_dicts_last_entry(self._episode_data, episode.data)
+        self._dirty = True
 
         # Only increment episode count if using default indexing
         if demo_id is None:
@@ -106,15 +124,27 @@ class TorchDatasetFileHandler(DatasetFileHandlerBase):
         # Not applicable for this handler since we store aggregated data
         raise NotImplementedError("Load episode not supported for preprocessed format")
 
-    def flush(self):
-        """Flush any pending data to disk."""
-        if self._file_path and self._episode_data:
-            # Stamp the quaternion convention; loaders refuse files without it.
-            torch.save({**self._episode_data, "quat_convention": "xyzw"}, self._file_path)
+    def flush(self, *, force: bool = False):
+        """Atomically save pending data when due, or immediately if forced."""
+        if not self._file_path or not self._dirty:
+            return
+        if not force and time.monotonic() - self._last_flush_time < self._flush_interval_s:
+            return
+        # Preserve the previous checkpoint if serialization fails or is interrupted.
+        fd, temporary_path = tempfile.mkstemp(dir=os.path.dirname(self._file_path) or ".", suffix=".pt")
+        try:
+            with os.fdopen(fd, "wb") as output:
+                torch.save({**self._episode_data, "quat_convention": "xyzw"}, output)
+            os.replace(temporary_path, self._file_path)
+        finally:
+            if os.path.exists(temporary_path):
+                os.unlink(temporary_path)
+        self._last_flush_time = time.monotonic()
+        self._dirty = False
 
     def close(self):
         """Close the dataset file handler."""
-        self.flush()
+        self.flush(force=True)
         self._episode_data = {}
         self._file_path = None
 
