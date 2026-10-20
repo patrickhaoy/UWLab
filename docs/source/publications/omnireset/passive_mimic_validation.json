@@ -1,0 +1,64 @@
+{
+  "date": "2026-10-20",
+  "robot_usd_sha256": "88e72878dc44065c12a73f60bc791f2fc8f8fee4178a44ad11b4f8bc49cd5378",
+  "lab2_checkpoint_sha256": "5d254bf6316fd7e6b84df2611def70f854d6d95ca7dd4e3015c34d0cc3049629",
+  "protocol": "128 first episodes, Reaching reset, seed 20261014, 160 control steps; identical initial-state hashes within runtime",
+  "peg_cases": [
+    {
+      "case": "lab2_removed",
+      "episodes": 128,
+      "successes": 125,
+      "initial_joint_sha256": "741b05d5d98b5a9ade0ad5e14f5f6d22165008e2d09eabad86e18c3ef00aa986",
+      "initial_object_sha256": "7ad0ec6abc7ddec924c81bbf41cea8b36dfd5b763bf3f69190a3eed754c3dc95",
+      "checkpoint_sha256": null
+    },
+    {
+      "case": "lab2_removed_mass_fixed",
+      "episodes": 128,
+      "successes": 23,
+      "initial_joint_sha256": "741b05d5d98b5a9ade0ad5e14f5f6d22165008e2d09eabad86e18c3ef00aa986",
+      "initial_object_sha256": "7ad0ec6abc7ddec924c81bbf41cea8b36dfd5b763bf3f69190a3eed754c3dc95",
+      "checkpoint_sha256": null
+    },
+    {
+      "case": "lab3_removed",
+      "episodes": 128,
+      "successes": 128,
+      "initial_joint_sha256": "eb2dd01e342b50f526a239b852b510e8a1398a5b5ac813c7cc00cb149c333df7",
+      "initial_object_sha256": "a2e081153c0428bec35db15990e0258e769285d784caaf1d694f633a3056e3ef",
+      "checkpoint_sha256": "65559aa2ead2518edccf5e59ad5687a34044df24bebdec71ae0041109916f015"
+    },
+    {
+      "case": "lab3_removed_mass_fixed",
+      "episodes": 128,
+      "successes": 20,
+      "initial_joint_sha256": "eb2dd01e342b50f526a239b852b510e8a1398a5b5ac813c7cc00cb149c333df7",
+      "initial_object_sha256": "a2e081153c0428bec35db15990e0258e769285d784caaf1d694f633a3056e3ef",
+      "checkpoint_sha256": "65559aa2ead2518edccf5e59ad5687a34044df24bebdec71ae0041109916f015"
+    },
+    {
+      "case": "lab3_exact_spawner",
+      "episodes": 128,
+      "successes": 20,
+      "initial_joint_sha256": "eb2dd01e342b50f526a239b852b510e8a1398a5b5ac813c7cc00cb149c333df7",
+      "initial_object_sha256": "a2e081153c0428bec35db15990e0258e769285d784caaf1d694f633a3056e3ef",
+      "checkpoint_sha256": "65559aa2ead2518edccf5e59ad5687a34044df24bebdec71ae0041109916f015"
+    }
+  ],
+  "lab3_free_space_finger_rad": {
+    "original": {
+      "open": 9.213833029875218e-10,
+      "close": 0.7805129885673523,
+      "reopen": 2.6647865524864756e-05
+    },
+    "candidate": {
+      "open": 1.2267273419297453e-08,
+      "close": 0.7806835174560547,
+      "reopen": 2.9486809580703266e-05
+    }
+  },
+  "close_target_rad": 0.785398,
+  "steps_per_phase": 360,
+  "sim_dt_s": 0.008333333333333333,
+  "note": "Four passive PhysxMimicJointAPI:rotZ schemas removed; physical joints and right-outer mimic retained. Mass-fixed cases also use 1mg safety, 30g camera mount, and 8.53g plus factory_v2 inertia on outer knuckles."
+}

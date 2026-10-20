@@ -5,11 +5,14 @@
 
 
 def apply_ur5e_physics_corrections(root):
-    """Set candidate mimic, camera, and outer-knuckle physics before initialization.
+    """Remove redundant passive mimics and correct masses before initialization.
 
-    Keep the physical linkage unchanged. The Sim 5.1 workaround uses finite
-    limits and three corrected gearing signs (UW-Lab/UWLab#39 and #46). This
-    candidate remains opt-in because checkpoint performance regresses.
+    Keep the physical linkage and the right-outer-knuckle mimic. The four
+    passive mimics require finite joint limits, but activating them prevents
+    the gripper from closing in Isaac Sim 6.1. Removing their APIs while
+    retaining the original infinite limits fixes the startup errors (#39) and
+    preserves free-space closing (#46). This candidate remains opt-in because
+    the mass corrections change released-checkpoint performance.
 
     The enlarged clearance box remains collision-enabled but contributes only
     1 mg. The physical camera/mount collider contributes 30 g, with its center
@@ -19,16 +22,16 @@ def apply_ur5e_physics_corrections(root):
     ineffective visual-mesh properties and PhysX's 1 kg sphere fallback. Joint
     armature is deliberately not imported from factory_v2.
     """
-    from pxr import Gf, UsdPhysics
+    from pxr import Gf, Sdf, UsdPhysics
 
-    signs = {
-        "left_inner_knuckle_joint": -1.0,
-        "right_inner_knuckle_joint": 1.0,
-        "left_inner_finger_knuckle_joint": -1.0,
-        "right_inner_finger_knuckle_joint": -1.0,
-    }
+    passive_joints = (
+        "left_inner_knuckle_joint",
+        "right_inner_knuckle_joint",
+        "left_inner_finger_knuckle_joint",
+        "right_inner_finger_knuckle_joint",
+    )
     stage = root.GetStage()
-    joints = {name: stage.GetPrimAtPath(root.GetPath().AppendChild(name)) for name in signs}
+    joints = {name: stage.GetPrimAtPath(root.GetPath().AppendChild(name)) for name in passive_joints}
     colliders = {
         "robotiq_base_link/collisions/d415_and_cable": 1.0e-6,
         "robotiq_base_link/collisions/D415_to_Robotiq_Mount": 0.030,
@@ -41,11 +44,19 @@ def apply_ur5e_physics_corrections(root):
     for name, prim in {**joints, **prims, **knuckles}.items():
         if not prim.IsValid():
             raise ValueError(f"UR5e physics corrections require {root.GetPath()}/{name}")
-    for name, prim in joints.items():
-        joint = UsdPhysics.RevoluteJoint(prim)
-        joint.CreateLowerLimitAttr(-1.0e10)  # USD revolute-joint limits are degrees.
-        joint.CreateUpperLimitAttr(1.0e10)
-        prim.GetAttribute("physxMimicJoint:rotZ:gearing").Set(signs[name])
+    for prim in joints.values():
+        schemas = prim.GetMetadata("apiSchemas")
+        if schemas is None or "PhysxMimicJointAPI:rotZ" not in schemas.explicitItems:
+            raise ValueError(f"Expected passive mimic schema on {prim.GetPath()}")
+        prim.SetMetadata(
+            "apiSchemas",
+            Sdf.TokenListOp.CreateExplicit(
+                [token for token in schemas.explicitItems if token != "PhysxMimicJointAPI:rotZ"]
+            ),
+        )
+        prim.GetAttribute("physxMimicJoint:rotZ:gearing").Block()
+        prim.GetAttribute("physxMimicJoint:rotZ:offset").Block()
+        prim.GetRelationship("physxMimicJoint:rotZ:referenceJoint").SetTargets([])
     for path, mass in colliders.items():
         UsdPhysics.MassAPI.Apply(prims[path]).CreateMassAttr(mass)
     # factory_v2 asset revision 975b2393654e72157301942ca598ddacdd23970d.

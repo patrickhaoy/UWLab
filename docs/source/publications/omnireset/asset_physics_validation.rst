@@ -1,7 +1,7 @@
 .. _ur5e-asset-physics-validation:
 
-UR5e camera, mimic, and knuckle candidate
-========================================
+UR5e camera, passive-mimic, and knuckle candidate
+================================================
 
 The combined physics candidate is **experimental and opt-in**. It does not preserve
 released-checkpoint performance. Existing robot configurations keep their original
@@ -11,9 +11,13 @@ reset collection, or playback physics.
 Changes
 -------
 
-* Four passive-joint limits become finite (+/-1e10 degrees) and three mimic gearing
-  signs follow `issue #46 <https://github.com/UW-Lab/UWLab/issues/46>`_. The physical
-  linkage and all mimic rules remain present.
+* The four passive ``PhysxMimicJointAPI:rotZ`` rules are removed while their
+  physical joints and infinite limits remain. The ``right_outer_knuckle_joint``
+  mimic remains. This removes the finite-limit startup errors in
+  `issue #39 <https://github.com/UW-Lab/UWLab/issues/39>`_ without activating
+  passive mimic constraints that stall closing on Isaac Sim 6.1. The sign
+  workaround reported in `issue #46 <https://github.com/UW-Lab/UWLab/issues/46>`_
+  is not applied to mimics that no longer exist.
 * The enlarged ``d415_and_cable`` safety collider stays enabled with mass 1e-6 kg
   (1 mg). Its dimensions and pose are unchanged.
 * The physical ``D415_to_Robotiq_Mount`` collider gets mass 0.030 kg (30 g).
@@ -24,17 +28,27 @@ Changes
   ``975b2393654e72157301942ca598ddacdd23970d`` and address issue #40.
   Joint armature is unchanged; no other factory_v2 settings are imported.
 
-Native Isaac Sim 5.1 readbacks confirm both knuckles use the explicit 8.53 g
-mass and the exact factory_v2 diagonal inertia. The fallback warnings disappear.
-The free-space finger reaches 0.778947 rad for a 0.785398 rad close command and
-returns near zero when reopened. The camera masses and other physics settings
-are preserved from the previous candidate.
+Native Isaac Sim 5.1 readbacks from the earlier candidate confirm both knuckles
+use the explicit 8.53 g mass and the exact factory_v2 diagonal inertia. The
+current candidate's Lab 3 free-space finger reaches 0.780684 rad for a
+0.785398 rad close command and returns near zero when reopened. No passive mimic
+parser errors or outer-knuckle fallback warnings were logged for that candidate.
 
-Knuckle-fix checkpoint comparison
---------------------------------
+With the original masses, removing the four passive mimics preserved the
+released Peg checkpoint: 125/128 first episodes on Sim 5.1 and 128/128 on
+Lab 3, compared with 125/128 original on each runtime. Adding the camera and
+knuckle mass corrections reduced that frozen checkpoint to 23/128 and 20/128,
+respectively, despite normal free-space gripper motion. This corrected-physics
+profile requires new policy training or separately validated adaptation. These
+tests do not establish object-contact grasping or new-policy convergence.
+Checkpoint hashes, paired initial-state hashes, and the free-space joint readings
+are recorded in :download:`passive_mimic_validation.json <passive_mimic_validation.json>`.
 
-The new candidate was evaluated on the same five tasks and frozen seed42
-checkpoints as the previous candidate, with 128 first episodes per task/runtime,
+Historical finite-mimic candidate comparison
+--------------------------------------------
+
+The previous candidate at commit ``18bd4d5`` was evaluated on five tasks with
+frozen seed42 checkpoints, with 128 first episodes per task/runtime,
 seed 20261014, Reaching resets, and a 16-second horizon. Initial robot/object
 state hashes match both previous candidate and original runs in every comparison.
 Original and previous-candidate measurements below are reused from the prior
@@ -74,14 +88,15 @@ validation; only the changed candidate was rerun. Rectangle/wall is excluded.
      - 52
      - 0
 
-Correcting the native mass properties does **not** establish compatibility with
-existing checkpoints or resolve the functional policy failures in #46. The
-candidate remains opt-in and production defaults remain unchanged.
+These results describe the superseded candidate with four finite passive
+limits and three mimic sign changes. They are retained as evidence of why the
+current candidate removes the four passive mimic rules. Production defaults
+remain unchanged.
 
 Native readbacks, per-environment success flags, checkpoint identities, and
 paired initial-state hashes are available in
 :download:`knuckle_physics_validation.json <knuckle_physics_validation.json>`.
-The reproduction command below now evaluates this updated candidate.
+The reproduction command below evaluates the current candidate instead.
 
 Previous camera/mimic-only validation
 -------------------------------------
