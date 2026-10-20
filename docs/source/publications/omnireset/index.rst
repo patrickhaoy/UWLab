@@ -381,6 +381,7 @@ The full OmniReset pipeline from custom task creation to real-robot deployment:
    :caption: Pipeline
 
    new_task
+   asset_physics_validation
    rl_training
    sim2real
    distillation

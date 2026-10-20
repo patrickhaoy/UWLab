@@ -1,0 +1,525 @@
+{
+  "date": "2026-10-19",
+  "seed": 20261014,
+  "episodes_per_task_variant": 128,
+  "control_steps": 160,
+  "reset_distribution": "ObjectAnywhereEEAnywhere (Reaching)",
+  "tasks": [
+    "peg",
+    "leg",
+    "drawer",
+    "cube",
+    "cupcake"
+  ],
+  "excluded_task": "rectangle/wall",
+  "hardware": "RTX PRO 6000 Blackwell",
+  "candidate": {
+    "mimic": "four finite limits +/-1e10 degrees and #46 gearing signs",
+    "safety_collider_mass_kg": 1e-06,
+    "physical_mount_collider_mass_kg": 0.03,
+    "outer_knuckle_mass_inertia": "unchanged"
+  },
+  "runtimes": {
+    "lab2": {
+      "description": "Isaac Sim 5.1.0 / Isaac Lab 2.3.2 / UWLab 1.3 snapshot / torch 2.7.0+cu128",
+      "checkpoints": {
+        "peg": {
+          "url": "https://huggingface.co/datasets/UW-Lab/uwlab-assets/resolve/f9486a69b30a38355c1c2415fc15f6d6be8cb5b3/Policies/OmniReset/state_based_experts/peg_state_rl_expert_seed42.pt",
+          "sha256": "5d254bf6316fd7e6b84df2611def70f854d6d95ca7dd4e3015c34d0cc3049629",
+          "bytes": 6770933
+        },
+        "leg": {
+          "url": "https://huggingface.co/datasets/UW-Lab/uwlab-assets/resolve/f9486a69b30a38355c1c2415fc15f6d6be8cb5b3/Policies/OmniReset/state_based_experts/leg_state_rl_expert_seed42.pt",
+          "sha256": "f75efd730e4a7bc0712333f52d758ac97a89d822a733290a126ca0b261b9c42b",
+          "bytes": 6937205
+        },
+        "drawer": {
+          "url": "https://huggingface.co/datasets/UW-Lab/uwlab-assets/resolve/f9486a69b30a38355c1c2415fc15f6d6be8cb5b3/Policies/OmniReset/state_based_experts/drawer_state_rl_expert_seed42.pt",
+          "sha256": "8a338623b6feddc2eb7f38f28d34c53c6ee43dec2cc64c327ce1a9b5187bdddb",
+          "bytes": 6789365
+        },
+        "cube": {
+          "url": "https://huggingface.co/datasets/UW-Lab/uwlab-assets/resolve/f9486a69b30a38355c1c2415fc15f6d6be8cb5b3/Policies/OmniReset/state_based_experts/cube_state_rl_expert_seed42.pt",
+          "sha256": "2cf0d83f42828c7aa99c3fc1a48a9747caf9aa493b17fcaa700cba86703482f0",
+          "bytes": 6770869
+        },
+        "cupcake": {
+          "url": "https://huggingface.co/datasets/UW-Lab/uwlab-assets/resolve/f9486a69b30a38355c1c2415fc15f6d6be8cb5b3/Policies/OmniReset/state_based_experts/cupcake_state_rl_expert_seed42.pt",
+          "sha256": "828fe40f00b3091657423d30af38c634028538babce579cf40962f77559ba112",
+          "bytes": 6770869
+        }
+      },
+      "cases": {
+        "cube/candidate": {
+          "variant": "candidate",
+          "task": "cube",
+          "initial_joint_sha256": "f96defc2e533e34190d84905cef79b36418f1d5b80b156be37a7f8250e48b7f9",
+          "initial_object_sha256": "73a83d6ae69635de8ef400dab1aea0371f23767a122c3fba0bfe92a05419935b",
+          "episodes": 128,
+          "successes": 112,
+          "seed": 20261014,
+          "control_steps": 160,
+          "seconds": 34.1119715780078,
+          "reset_distribution": "ObjectAnywhereEEAnywhere (Reaching)",
+          "timeouts": 128,
+          "first_episode_success_by_env": [1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1]
+        },
+        "cube/original": {
+          "variant": "original",
+          "task": "cube",
+          "initial_joint_sha256": "f96defc2e533e34190d84905cef79b36418f1d5b80b156be37a7f8250e48b7f9",
+          "initial_object_sha256": "73a83d6ae69635de8ef400dab1aea0371f23767a122c3fba0bfe92a05419935b",
+          "episodes": 128,
+          "successes": 121,
+          "seed": 20261014,
+          "control_steps": 160,
+          "seconds": 49.72926268700394,
+          "reset_distribution": "ObjectAnywhereEEAnywhere (Reaching)",
+          "timeouts": 127,
+          "first_episode_success_by_env": [1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        },
+        "cupcake/candidate": {
+          "variant": "candidate",
+          "task": "cupcake",
+          "initial_joint_sha256": "2ae209ce8bdb95a950ae43564a732e927fd7a079c441363d9ba455db45042cfc",
+          "initial_object_sha256": "81853c63936f00d3862440a1518dfb4d523172773a9304ac82a2aaf0217e5bc2",
+          "episodes": 128,
+          "successes": 102,
+          "seed": 20261014,
+          "control_steps": 160,
+          "seconds": 57.17617506100214,
+          "reset_distribution": "ObjectAnywhereEEAnywhere (Reaching)",
+          "timeouts": 128,
+          "first_episode_success_by_env": [1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1]
+        },
+        "cupcake/original": {
+          "variant": "original",
+          "task": "cupcake",
+          "initial_joint_sha256": "2ae209ce8bdb95a950ae43564a732e927fd7a079c441363d9ba455db45042cfc",
+          "initial_object_sha256": "81853c63936f00d3862440a1518dfb4d523172773a9304ac82a2aaf0217e5bc2",
+          "episodes": 128,
+          "successes": 123,
+          "seed": 20261014,
+          "control_steps": 160,
+          "seconds": 42.562270866008475,
+          "reset_distribution": "ObjectAnywhereEEAnywhere (Reaching)",
+          "timeouts": 128,
+          "first_episode_success_by_env": [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        },
+        "drawer/candidate": {
+          "variant": "candidate",
+          "task": "drawer",
+          "initial_joint_sha256": "e70a4ff22556c4b92139162e49941723339d0fbda34b65870ea7cd3a696d35ad",
+          "initial_object_sha256": "5cdf65dfe7b51256c59417e7128b215d28e735b38e5d3bb00810a03f78293532",
+          "episodes": 128,
+          "successes": 126,
+          "seed": 20261014,
+          "control_steps": 160,
+          "seconds": 77.15291250598966,
+          "reset_distribution": "ObjectAnywhereEEAnywhere (Reaching)",
+          "timeouts": 127,
+          "first_episode_success_by_env": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        },
+        "drawer/original": {
+          "variant": "original",
+          "task": "drawer",
+          "initial_joint_sha256": "e70a4ff22556c4b92139162e49941723339d0fbda34b65870ea7cd3a696d35ad",
+          "initial_object_sha256": "5cdf65dfe7b51256c59417e7128b215d28e735b38e5d3bb00810a03f78293532",
+          "episodes": 128,
+          "successes": 125,
+          "seed": 20261014,
+          "control_steps": 160,
+          "seconds": 56.83474074098922,
+          "reset_distribution": "ObjectAnywhereEEAnywhere (Reaching)",
+          "timeouts": 128,
+          "first_episode_success_by_env": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        },
+        "leg/candidate": {
+          "variant": "candidate",
+          "task": "leg",
+          "initial_joint_sha256": "d71993889bb908b9e928ed9ff68cc23213aaf1d267e9e131f0b755609d26f26e",
+          "initial_object_sha256": "517e45503877b6057bd03b1e417b2669463bdbb1f7fcbc3faf63eb6dee737920",
+          "episodes": 128,
+          "successes": 52,
+          "seed": 20261014,
+          "control_steps": 160,
+          "seconds": 60.39125797999441,
+          "reset_distribution": "ObjectAnywhereEEAnywhere (Reaching)",
+          "timeouts": 128,
+          "first_episode_success_by_env": [0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1]
+        },
+        "leg/original": {
+          "variant": "original",
+          "task": "leg",
+          "initial_joint_sha256": "d71993889bb908b9e928ed9ff68cc23213aaf1d267e9e131f0b755609d26f26e",
+          "initial_object_sha256": "517e45503877b6057bd03b1e417b2669463bdbb1f7fcbc3faf63eb6dee737920",
+          "episodes": 128,
+          "successes": 117,
+          "seed": 20261014,
+          "control_steps": 160,
+          "seconds": 77.45292711099319,
+          "reset_distribution": "ObjectAnywhereEEAnywhere (Reaching)",
+          "timeouts": 128,
+          "first_episode_success_by_env": [1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        },
+        "peg/candidate": {
+          "variant": "candidate",
+          "task": "peg",
+          "initial_joint_sha256": "741b05d5d98b5a9ade0ad5e14f5f6d22165008e2d09eabad86e18c3ef00aa986",
+          "initial_object_sha256": "7ad0ec6abc7ddec924c81bbf41cea8b36dfd5b763bf3f69190a3eed754c3dc95",
+          "episodes": 128,
+          "successes": 107,
+          "seed": 20261014,
+          "control_steps": 160,
+          "seconds": 32.562277397999424,
+          "reset_distribution": "ObjectAnywhereEEAnywhere (Reaching)",
+          "timeouts": 128,
+          "first_episode_success_by_env": [1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1]
+        },
+        "peg/original": {
+          "variant": "original",
+          "task": "peg",
+          "initial_joint_sha256": "741b05d5d98b5a9ade0ad5e14f5f6d22165008e2d09eabad86e18c3ef00aa986",
+          "initial_object_sha256": "7ad0ec6abc7ddec924c81bbf41cea8b36dfd5b763bf3f69190a3eed754c3dc95",
+          "episodes": 128,
+          "successes": 125,
+          "seed": 20261014,
+          "control_steps": 160,
+          "seconds": 29.516261199998553,
+          "reset_distribution": "ObjectAnywhereEEAnywhere (Reaching)",
+          "timeouts": 128,
+          "first_episode_success_by_env": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        }
+      },
+      "paired_results": {
+        "peg": {
+          "original_successes": 125,
+          "candidate_successes": 107,
+          "initial_state_hashes_match": true
+        },
+        "leg": {
+          "original_successes": 117,
+          "candidate_successes": 52,
+          "initial_state_hashes_match": true
+        },
+        "drawer": {
+          "original_successes": 125,
+          "candidate_successes": 126,
+          "initial_state_hashes_match": true
+        },
+        "cube": {
+          "original_successes": 121,
+          "candidate_successes": 112,
+          "initial_state_hashes_match": true
+        },
+        "cupcake": {
+          "original_successes": 123,
+          "candidate_successes": 102,
+          "initial_state_hashes_match": true
+        }
+      }
+    },
+    "lab3": {
+      "description": "Isaac Sim 6.1.0 / Isaac Lab 3.0 EA ae37b028ea415c91ea2bc32609efcd759ed2b974 / UWLab branch / torch 2.11.0+cu128",
+      "checkpoints": {
+        "peg": {
+          "url": "https://huggingface.co/datasets/UW-Lab/uwlab-assets/resolve/83860532010b2737aa80d6e8621235ee554186f0/Policies/OmniReset/state_based_experts/peg_state_rl_expert_seed42.pt",
+          "sha256": "65559aa2ead2518edccf5e59ad5687a34044df24bebdec71ae0041109916f015",
+          "bytes": 4720923
+        },
+        "leg": {
+          "url": "https://huggingface.co/datasets/UW-Lab/uwlab-assets/resolve/83860532010b2737aa80d6e8621235ee554186f0/Policies/OmniReset/state_based_experts/leg_state_rl_expert_seed42.pt",
+          "sha256": "2840fb22ac821e097000fdeeabc2d461a955465e6820bdd5a9e1043132fb2159",
+          "bytes": 4720923
+        },
+        "drawer": {
+          "url": "https://huggingface.co/datasets/UW-Lab/uwlab-assets/resolve/83860532010b2737aa80d6e8621235ee554186f0/Policies/OmniReset/state_based_experts/drawer_state_rl_expert_seed42.pt",
+          "sha256": "31dc885bde1a45bec18d930e79d36a1ae67f0dd4fc4ca326a6fb03fe3d9c2b76",
+          "bytes": 4720923
+        },
+        "cube": {
+          "url": "https://huggingface.co/datasets/UW-Lab/uwlab-assets/resolve/83860532010b2737aa80d6e8621235ee554186f0/Policies/OmniReset/state_based_experts/cube_state_rl_expert_seed42.pt",
+          "sha256": "251a0cbacd018c98dede02308dff37dedcd9742cc9bd2debe091ba9fe06bbf9b",
+          "bytes": 4720923
+        },
+        "cupcake": {
+          "url": "https://huggingface.co/datasets/UW-Lab/uwlab-assets/resolve/83860532010b2737aa80d6e8621235ee554186f0/Policies/OmniReset/state_based_experts/cupcake_state_rl_expert_seed42.pt",
+          "sha256": "21fd0f72620eb0c5f4d160047e258ed5d33ee2d998e0bf2ca95871812fe8c6ed",
+          "bytes": 4720923
+        }
+      },
+      "cases": {
+        "cube/candidate": {
+          "variant": "candidate",
+          "task": "cube",
+          "initial_joint_sha256": "3031fd549967b18a230d8ebfdd52ca60885b01d06b6af871b40b4249cb91e19e",
+          "initial_object_sha256": "2ede596c1bc70a04d5c1b7611ddaaa4b5af8e0aa03d80562a198e9980ce04370",
+          "episodes": 128,
+          "successes": 0,
+          "seed": 20261014,
+          "control_steps": 160,
+          "seconds": 36.17378336600086,
+          "reset_distribution": "ObjectAnywhereEEAnywhere (Reaching)",
+          "timeouts": 127,
+          "first_episode_success_by_env": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        },
+        "cube/original": {
+          "variant": "original",
+          "task": "cube",
+          "initial_joint_sha256": "3031fd549967b18a230d8ebfdd52ca60885b01d06b6af871b40b4249cb91e19e",
+          "initial_object_sha256": "2ede596c1bc70a04d5c1b7611ddaaa4b5af8e0aa03d80562a198e9980ce04370",
+          "episodes": 128,
+          "successes": 118,
+          "seed": 20261014,
+          "control_steps": 160,
+          "seconds": 23.662225052001304,
+          "reset_distribution": "ObjectAnywhereEEAnywhere (Reaching)",
+          "timeouts": 127,
+          "first_episode_success_by_env": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        },
+        "cupcake/candidate": {
+          "variant": "candidate",
+          "task": "cupcake",
+          "initial_joint_sha256": "8cf5354dc9bfeb710b0ecc86184b4ac39e701dfaa9cf992d23bf4afa658a6452",
+          "initial_object_sha256": "1bf357bd024092af9780bc0b2577ce1ff9f0d9b82662ed7cdebf48a440c56ed1",
+          "episodes": 128,
+          "successes": 52,
+          "seed": 20261014,
+          "control_steps": 160,
+          "seconds": 33.047505790003925,
+          "reset_distribution": "ObjectAnywhereEEAnywhere (Reaching)",
+          "timeouts": 128,
+          "first_episode_success_by_env": [1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0]
+        },
+        "cupcake/original": {
+          "variant": "original",
+          "task": "cupcake",
+          "initial_joint_sha256": "8cf5354dc9bfeb710b0ecc86184b4ac39e701dfaa9cf992d23bf4afa658a6452",
+          "initial_object_sha256": "1bf357bd024092af9780bc0b2577ce1ff9f0d9b82662ed7cdebf48a440c56ed1",
+          "episodes": 128,
+          "successes": 124,
+          "seed": 20261014,
+          "control_steps": 160,
+          "seconds": 49.99182983899664,
+          "reset_distribution": "ObjectAnywhereEEAnywhere (Reaching)",
+          "timeouts": 128,
+          "first_episode_success_by_env": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        },
+        "drawer/candidate": {
+          "variant": "candidate",
+          "task": "drawer",
+          "initial_joint_sha256": "d24b1c97f2526c1fe6c89a38581535a5a5d5af0dc6736e2c9a3cba478b91cb60",
+          "initial_object_sha256": "9a754e4d01a25417786ebf673c1330a7b8633b937b0dad3d8b9cdfeed46e0130",
+          "episodes": 128,
+          "successes": 0,
+          "seed": 20261014,
+          "control_steps": 160,
+          "seconds": 35.893416204999085,
+          "reset_distribution": "ObjectAnywhereEEAnywhere (Reaching)",
+          "timeouts": 127,
+          "first_episode_success_by_env": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        },
+        "drawer/original": {
+          "variant": "original",
+          "task": "drawer",
+          "initial_joint_sha256": "d24b1c97f2526c1fe6c89a38581535a5a5d5af0dc6736e2c9a3cba478b91cb60",
+          "initial_object_sha256": "9a754e4d01a25417786ebf673c1330a7b8633b937b0dad3d8b9cdfeed46e0130",
+          "episodes": 128,
+          "successes": 0,
+          "seed": 20261014,
+          "control_steps": 160,
+          "seconds": 59.61077901000681,
+          "reset_distribution": "ObjectAnywhereEEAnywhere (Reaching)",
+          "timeouts": 128,
+          "first_episode_success_by_env": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        },
+        "leg/candidate": {
+          "variant": "candidate",
+          "task": "leg",
+          "initial_joint_sha256": "63ce7643158af13cb9814942beb0b8140c49f0e2da56f47c1a229b7923736f69",
+          "initial_object_sha256": "8415375fe87ae139c2125c1a8f8e95c05be5d992bf04cb833c48b8b857d694b8",
+          "episodes": 128,
+          "successes": 0,
+          "seed": 20261014,
+          "control_steps": 160,
+          "seconds": 65.29660899699957,
+          "reset_distribution": "ObjectAnywhereEEAnywhere (Reaching)",
+          "timeouts": 126,
+          "first_episode_success_by_env": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        },
+        "leg/original": {
+          "variant": "original",
+          "task": "leg",
+          "initial_joint_sha256": "63ce7643158af13cb9814942beb0b8140c49f0e2da56f47c1a229b7923736f69",
+          "initial_object_sha256": "8415375fe87ae139c2125c1a8f8e95c05be5d992bf04cb833c48b8b857d694b8",
+          "episodes": 128,
+          "successes": 118,
+          "seed": 20261014,
+          "control_steps": 160,
+          "seconds": 55.15633389799041,
+          "reset_distribution": "ObjectAnywhereEEAnywhere (Reaching)",
+          "timeouts": 128,
+          "first_episode_success_by_env": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        },
+        "peg/camera_only": {
+          "variant": "camera_only",
+          "task": "peg",
+          "initial_joint_sha256": "eb2dd01e342b50f526a239b852b510e8a1398a5b5ac813c7cc00cb149c333df7",
+          "initial_object_sha256": "a2e081153c0428bec35db15990e0258e769285d784caaf1d694f633a3056e3ef",
+          "episodes": 128,
+          "successes": 22,
+          "seed": 20261014,
+          "control_steps": 160,
+          "seconds": 59.869515652011614,
+          "reset_distribution": "ObjectAnywhereEEAnywhere (Reaching)",
+          "timeouts": 125,
+          "first_episode_success_by_env": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1]
+        },
+        "peg/candidate": {
+          "variant": "candidate",
+          "task": "peg",
+          "initial_joint_sha256": "eb2dd01e342b50f526a239b852b510e8a1398a5b5ac813c7cc00cb149c333df7",
+          "initial_object_sha256": "a2e081153c0428bec35db15990e0258e769285d784caaf1d694f633a3056e3ef",
+          "episodes": 128,
+          "successes": 0,
+          "seed": 20261014,
+          "control_steps": 160,
+          "seconds": 55.010717682991526,
+          "reset_distribution": "ObjectAnywhereEEAnywhere (Reaching)",
+          "timeouts": 128,
+          "first_episode_success_by_env": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        },
+        "peg/mimic_only": {
+          "variant": "mimic_only",
+          "task": "peg",
+          "initial_joint_sha256": "eb2dd01e342b50f526a239b852b510e8a1398a5b5ac813c7cc00cb149c333df7",
+          "initial_object_sha256": "a2e081153c0428bec35db15990e0258e769285d784caaf1d694f633a3056e3ef",
+          "episodes": 128,
+          "successes": 0,
+          "seed": 20261014,
+          "control_steps": 160,
+          "seconds": 68.6287228519941,
+          "reset_distribution": "ObjectAnywhereEEAnywhere (Reaching)",
+          "timeouts": 128,
+          "first_episode_success_by_env": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        },
+        "peg/original": {
+          "variant": "original",
+          "task": "peg",
+          "initial_joint_sha256": "eb2dd01e342b50f526a239b852b510e8a1398a5b5ac813c7cc00cb149c333df7",
+          "initial_object_sha256": "a2e081153c0428bec35db15990e0258e769285d784caaf1d694f633a3056e3ef",
+          "episodes": 128,
+          "successes": 125,
+          "seed": 20261014,
+          "control_steps": 160,
+          "seconds": 51.57525648800947,
+          "reset_distribution": "ObjectAnywhereEEAnywhere (Reaching)",
+          "timeouts": 128,
+          "first_episode_success_by_env": [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        }
+      },
+      "paired_results": {
+        "peg": {
+          "original_successes": 125,
+          "candidate_successes": 0,
+          "initial_state_hashes_match": true
+        },
+        "leg": {
+          "original_successes": 118,
+          "candidate_successes": 0,
+          "initial_state_hashes_match": true
+        },
+        "drawer": {
+          "original_successes": 0,
+          "candidate_successes": 0,
+          "initial_state_hashes_match": true
+        },
+        "cube": {
+          "original_successes": 118,
+          "candidate_successes": 0,
+          "initial_state_hashes_match": true
+        },
+        "cupcake": {
+          "original_successes": 124,
+          "candidate_successes": 52,
+          "initial_state_hashes_match": true
+        }
+      }
+    }
+  },
+  "native_mass_probe": {
+    "candidate": {
+      "gripper_base_mass_kg": 0.6398921012878418,
+      "knuckle_mass_kg": 1.0,
+      "knuckle_inertia_kg_m2": [
+        0.004000000189989805,
+        0.0,
+        0.0,
+        0.0,
+        0.004000000189989805,
+        0.0,
+        0.0,
+        0.0,
+        0.004000000189989805
+      ],
+      "finger_position_rad": {
+        "open": -8.425905241437476e-16,
+        "close": 0.7792637348175049,
+        "reopen": 2.529415360186249e-05
+      }
+    },
+    "no_safety": {
+      "gripper_base_mass_kg": 0.6398910880088806,
+      "knuckle_mass_kg": 1.0,
+      "knuckle_inertia_kg_m2": [
+        0.004000000189989805,
+        0.0,
+        0.0,
+        0.0,
+        0.004000000189989805,
+        0.0,
+        0.0,
+        0.0,
+        0.004000000189989805
+      ],
+      "finger_position_rad": {
+        "open": 3.458368951214652e-07,
+        "close": 0.7792643308639526,
+        "reopen": 2.4825123546179384e-05
+      }
+    },
+    "no_mount": {
+      "gripper_base_mass_kg": 0.6098921298980713,
+      "knuckle_mass_kg": 1.0,
+      "knuckle_inertia_kg_m2": [
+        0.004000000189989805,
+        0.0,
+        0.0,
+        0.0,
+        0.004000000189989805,
+        0.0,
+        0.0,
+        0.0,
+        0.004000000189989805
+      ],
+      "finger_position_rad": {
+        "open": -8.165280615105616e-16,
+        "close": 0.779262125492096,
+        "reopen": 2.5515848392387852e-05
+      }
+    }
+  },
+  "disposition": "Experimental opt-in only; existing asset configurations retain original physics because checkpoint compatibility regresses.",
+  "checkpoint_compatibility_preserved": false,
+  "lab3_inference_matches_official_rsl_rl": true,
+  "input_hashes": {
+    "candidate_usda": "c35383bf4954d8169cf5e0edc6132d50ce2045b6d515da9c76e1bb4a9b844383",
+    "released_usd": "88e72878dc44065c12a73f60bc791f2fc8f8fee4178a44ad11b4f8bc49cd5378"
+  },
+  "source_commits": {
+    "uwlab_lab2": "825cfce364f7e34b4b29aab73d37c5a1464f4375",
+    "isaaclab_lab2": "37ddf626871758333d6ed89cf64ad702aef127d0",
+    "uwlab_branch_parent": "50234d160b9045f9b7abef55b5f91a9abf00d22e",
+    "isaaclab_lab3": "ae37b028ea415c91ea2bc32609efcd759ed2b974"
+  }
+}

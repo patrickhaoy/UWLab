@@ -21,6 +21,8 @@ from isaaclab.assets.articulation import ArticulationCfg
 
 from uwlab_assets import UWLAB_CLOUD_ASSETS_DIR
 
+from .usd_physics import apply_ur5e_physics_corrections
+
 logger = logging.getLogger(__name__)
 
 ROBOTIQ_2F85_DEFAULT_JOINT_POS = {
@@ -70,6 +72,20 @@ def spawn_ur5e_without_physics_materials(prim_path, cfg, translation=None, orien
         removed.extend(sorted(material_paths))
     if removed:
         logger.info(f"Removed USD physics materials from spawned UR5e (PhysX 64K material cap): {removed}")
+    return prim
+
+
+def spawn_ur5e_with_candidate_physics(prim_path, cfg, translation=None, orientation=None):
+    """Opt in to #46 mimic corrections and 30 g camera / 1 mg clearance masses.
+
+    This candidate changes checkpoint behavior, including regressions on Isaac
+    Lab 3. Keep existing configurations on the original spawner until retraining
+    or further validation establishes compatibility. See the asset evaluation
+    results in the OmniReset documentation.
+    """
+    prim = spawn_ur5e_without_physics_materials(prim_path, cfg, translation, orientation)
+    for root in sim_utils.find_matching_prims(prim_path) or [prim]:
+        apply_ur5e_physics_corrections(root)
     return prim
 
 

@@ -5,6 +5,9 @@ Collect Resets & Train RL Policy
 
 Reproduce our training results from scratch.
 
+For the experimental camera-mass and mimic-joint candidate, see
+:ref:`ur5e-asset-physics-validation`. Existing configurations retain their original physics.
+
 Reset collection saves its first successful batch immediately, then checkpoints at
 most once every 60 seconds and saves all remaining states on completion or Ctrl+C.
 Use ``--save_interval SECONDS`` to change this interval, or ``--save_interval 0``
