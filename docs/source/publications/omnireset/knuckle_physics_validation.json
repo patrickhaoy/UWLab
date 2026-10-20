@@ -1,0 +1,506 @@
+{
+  "date": "2026-10-19",
+  "parent_commit": "165aac0eac09eeb20857068ce0596ef218ee7939",
+  "baseline_results_file": "asset_physics_validation.json",
+  "factory_asset_revision": "975b2393654e72157301942ca598ddacdd23970d",
+  "factory_asset_sha256": "9c68b15e87a009cfc3f1ca9c4f9b1376e90f29b1801bfdecb5caae2e4091650c",
+  "changes": {
+    "left_and_right_outer_knuckle_mass_kg": 0.00853,
+    "diagonal_inertia_kg_m2": [
+      2.89e-06,
+      1.87e-06,
+      1.22e-06
+    ],
+    "joint_armature": "unchanged from previous candidate"
+  },
+  "seed": 20261014,
+  "episodes_per_case": 128,
+  "reset_distribution": "ObjectAnywhereEEAnywhere (Reaching)",
+  "control_steps": 160,
+  "runtimes": {
+    "lab2": {
+      "description": "Isaac Sim 5.1.0 / Isaac Lab 2.3.2 / UWLab 1.3 snapshot / torch 2.7.0+cu128",
+      "checkpoints": {
+        "peg": {
+          "url": "https://huggingface.co/datasets/UW-Lab/uwlab-assets/resolve/f9486a69b30a38355c1c2415fc15f6d6be8cb5b3/Policies/OmniReset/state_based_experts/peg_state_rl_expert_seed42.pt",
+          "sha256": "5d254bf6316fd7e6b84df2611def70f854d6d95ca7dd4e3015c34d0cc3049629",
+          "bytes": 6770933
+        },
+        "leg": {
+          "url": "https://huggingface.co/datasets/UW-Lab/uwlab-assets/resolve/f9486a69b30a38355c1c2415fc15f6d6be8cb5b3/Policies/OmniReset/state_based_experts/leg_state_rl_expert_seed42.pt",
+          "sha256": "f75efd730e4a7bc0712333f52d758ac97a89d822a733290a126ca0b261b9c42b",
+          "bytes": 6937205
+        },
+        "drawer": {
+          "url": "https://huggingface.co/datasets/UW-Lab/uwlab-assets/resolve/f9486a69b30a38355c1c2415fc15f6d6be8cb5b3/Policies/OmniReset/state_based_experts/drawer_state_rl_expert_seed42.pt",
+          "sha256": "8a338623b6feddc2eb7f38f28d34c53c6ee43dec2cc64c327ce1a9b5187bdddb",
+          "bytes": 6789365
+        },
+        "cube": {
+          "url": "https://huggingface.co/datasets/UW-Lab/uwlab-assets/resolve/f9486a69b30a38355c1c2415fc15f6d6be8cb5b3/Policies/OmniReset/state_based_experts/cube_state_rl_expert_seed42.pt",
+          "sha256": "2cf0d83f42828c7aa99c3fc1a48a9747caf9aa493b17fcaa700cba86703482f0",
+          "bytes": 6770869
+        },
+        "cupcake": {
+          "url": "https://huggingface.co/datasets/UW-Lab/uwlab-assets/resolve/f9486a69b30a38355c1c2415fc15f6d6be8cb5b3/Policies/OmniReset/state_based_experts/cupcake_state_rl_expert_seed42.pt",
+          "sha256": "828fe40f00b3091657423d30af38c634028538babce579cf40962f77559ba112",
+          "bytes": 6770869
+        }
+      },
+      "cases": {
+        "peg": {
+          "variant": "candidate",
+          "task": "peg",
+          "initial_joint_sha256": "741b05d5d98b5a9ade0ad5e14f5f6d22165008e2d09eabad86e18c3ef00aa986",
+          "initial_object_sha256": "7ad0ec6abc7ddec924c81bbf41cea8b36dfd5b763bf3f69190a3eed754c3dc95",
+          "episodes": 128,
+          "successes": 20,
+          "seed": 20261014,
+          "control_steps": 160,
+          "seconds": 57.74916680699971,
+          "reset_distribution": "ObjectAnywhereEEAnywhere (Reaching)",
+          "knuckles_after_randomization": {
+            "left_outer_knuckle": {
+              "mass_kg": 0.008632265962660313,
+              "diagonal_inertia_kg_m2": [
+                2.924648015323328e-06,
+                1.8924192772828974e-06,
+                1.2346265521046007e-06
+              ]
+            },
+            "right_outer_knuckle": {
+              "mass_kg": 0.008527666330337524,
+              "diagonal_inertia_kg_m2": [
+                2.889209099521395e-06,
+                1.8694881873670965e-06,
+                1.2196661600683e-06
+              ]
+            }
+          },
+          "first_episode_success_by_env": [0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0],
+          "timeouts": 128
+        },
+        "leg": {
+          "variant": "candidate",
+          "task": "leg",
+          "initial_joint_sha256": "d71993889bb908b9e928ed9ff68cc23213aaf1d267e9e131f0b755609d26f26e",
+          "initial_object_sha256": "517e45503877b6057bd03b1e417b2669463bdbb1f7fcbc3faf63eb6dee737920",
+          "episodes": 128,
+          "successes": 0,
+          "seed": 20261014,
+          "control_steps": 160,
+          "seconds": 60.54450557701057,
+          "reset_distribution": "ObjectAnywhereEEAnywhere (Reaching)",
+          "knuckles_after_randomization": {
+            "left_outer_knuckle": {
+              "mass_kg": 0.007177609018981457,
+              "diagonal_inertia_kg_m2": [
+                2.43180420511635e-06,
+                1.5735203078293125e-06,
+                1.0265747505400213e-06
+              ]
+            },
+            "right_outer_knuckle": {
+              "mass_kg": 0.007152569945901632,
+              "diagonal_inertia_kg_m2": [
+                2.4233206659118878e-06,
+                1.5680309388699243e-06,
+                1.0229935014649527e-06
+              ]
+            }
+          },
+          "first_episode_success_by_env": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+          "timeouts": 126
+        },
+        "drawer": {
+          "variant": "candidate",
+          "task": "drawer",
+          "initial_joint_sha256": "e70a4ff22556c4b92139162e49941723339d0fbda34b65870ea7cd3a696d35ad",
+          "initial_object_sha256": "5cdf65dfe7b51256c59417e7128b215d28e735b38e5d3bb00810a03f78293532",
+          "episodes": 128,
+          "successes": 13,
+          "seed": 20261014,
+          "control_steps": 160,
+          "seconds": 54.35646953500691,
+          "reset_distribution": "ObjectAnywhereEEAnywhere (Reaching)",
+          "knuckles_after_randomization": {
+            "left_outer_knuckle": {
+              "mass_kg": 0.009696505032479763,
+              "diagonal_inertia_kg_m2": [
+                3.28521696246753e-06,
+                2.1257283151498996e-06,
+                1.3868389032722916e-06
+              ]
+            },
+            "right_outer_knuckle": {
+              "mass_kg": 0.008851299993693829,
+              "diagonal_inertia_kg_m2": [
+                2.9988575533934636e-06,
+                1.9404371869313763e-06,
+                1.265953756046656e-06
+              ]
+            }
+          },
+          "first_episode_success_by_env": [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+          "timeouts": 122
+        },
+        "cube": {
+          "variant": "candidate",
+          "task": "cube",
+          "initial_joint_sha256": "f96defc2e533e34190d84905cef79b36418f1d5b80b156be37a7f8250e48b7f9",
+          "initial_object_sha256": "73a83d6ae69635de8ef400dab1aea0371f23767a122c3fba0bfe92a05419935b",
+          "episodes": 128,
+          "successes": 61,
+          "seed": 20261014,
+          "control_steps": 160,
+          "seconds": 41.47246222499234,
+          "reset_distribution": "ObjectAnywhereEEAnywhere (Reaching)",
+          "knuckles_after_randomization": {
+            "left_outer_knuckle": {
+              "mass_kg": 0.008632265962660313,
+              "diagonal_inertia_kg_m2": [
+                2.924648015323328e-06,
+                1.8924192772828974e-06,
+                1.2346265521046007e-06
+              ]
+            },
+            "right_outer_knuckle": {
+              "mass_kg": 0.008527666330337524,
+              "diagonal_inertia_kg_m2": [
+                2.889209099521395e-06,
+                1.8694881873670965e-06,
+                1.2196661600683e-06
+              ]
+            }
+          },
+          "first_episode_success_by_env": [1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1],
+          "timeouts": 128
+        },
+        "cupcake": {
+          "variant": "candidate",
+          "task": "cupcake",
+          "initial_joint_sha256": "2ae209ce8bdb95a950ae43564a732e927fd7a079c441363d9ba455db45042cfc",
+          "initial_object_sha256": "81853c63936f00d3862440a1518dfb4d523172773a9304ac82a2aaf0217e5bc2",
+          "episodes": 128,
+          "successes": 31,
+          "seed": 20261014,
+          "control_steps": 160,
+          "seconds": 37.51557094999589,
+          "reset_distribution": "ObjectAnywhereEEAnywhere (Reaching)",
+          "knuckles_after_randomization": {
+            "left_outer_knuckle": {
+              "mass_kg": 0.008632265962660313,
+              "diagonal_inertia_kg_m2": [
+                2.924648015323328e-06,
+                1.8924192772828974e-06,
+                1.2346265521046007e-06
+              ]
+            },
+            "right_outer_knuckle": {
+              "mass_kg": 0.008527666330337524,
+              "diagonal_inertia_kg_m2": [
+                2.889209099521395e-06,
+                1.8694881873670965e-06,
+                1.2196661600683e-06
+              ]
+            }
+          },
+          "first_episode_success_by_env": [1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+          "timeouts": 128
+        }
+      },
+      "comparison": {
+        "peg": {
+          "original": 125,
+          "previous_candidate": 107,
+          "with_knuckle_fix": 20,
+          "initial_states_match": true
+        },
+        "leg": {
+          "original": 117,
+          "previous_candidate": 52,
+          "with_knuckle_fix": 0,
+          "initial_states_match": true
+        },
+        "drawer": {
+          "original": 125,
+          "previous_candidate": 126,
+          "with_knuckle_fix": 13,
+          "initial_states_match": true
+        },
+        "cube": {
+          "original": 121,
+          "previous_candidate": 112,
+          "with_knuckle_fix": 61,
+          "initial_states_match": true
+        },
+        "cupcake": {
+          "original": 123,
+          "previous_candidate": 102,
+          "with_knuckle_fix": 31,
+          "initial_states_match": true
+        }
+      }
+    },
+    "lab3": {
+      "description": "Isaac Sim 6.1.0 / Isaac Lab 3.0 EA ae37b028ea415c91ea2bc32609efcd759ed2b974 / UWLab branch / torch 2.11.0+cu128",
+      "checkpoints": {
+        "peg": {
+          "url": "https://huggingface.co/datasets/UW-Lab/uwlab-assets/resolve/83860532010b2737aa80d6e8621235ee554186f0/Policies/OmniReset/state_based_experts/peg_state_rl_expert_seed42.pt",
+          "sha256": "65559aa2ead2518edccf5e59ad5687a34044df24bebdec71ae0041109916f015",
+          "bytes": 4720923
+        },
+        "leg": {
+          "url": "https://huggingface.co/datasets/UW-Lab/uwlab-assets/resolve/83860532010b2737aa80d6e8621235ee554186f0/Policies/OmniReset/state_based_experts/leg_state_rl_expert_seed42.pt",
+          "sha256": "2840fb22ac821e097000fdeeabc2d461a955465e6820bdd5a9e1043132fb2159",
+          "bytes": 4720923
+        },
+        "drawer": {
+          "url": "https://huggingface.co/datasets/UW-Lab/uwlab-assets/resolve/83860532010b2737aa80d6e8621235ee554186f0/Policies/OmniReset/state_based_experts/drawer_state_rl_expert_seed42.pt",
+          "sha256": "31dc885bde1a45bec18d930e79d36a1ae67f0dd4fc4ca326a6fb03fe3d9c2b76",
+          "bytes": 4720923
+        },
+        "cube": {
+          "url": "https://huggingface.co/datasets/UW-Lab/uwlab-assets/resolve/83860532010b2737aa80d6e8621235ee554186f0/Policies/OmniReset/state_based_experts/cube_state_rl_expert_seed42.pt",
+          "sha256": "251a0cbacd018c98dede02308dff37dedcd9742cc9bd2debe091ba9fe06bbf9b",
+          "bytes": 4720923
+        },
+        "cupcake": {
+          "url": "https://huggingface.co/datasets/UW-Lab/uwlab-assets/resolve/83860532010b2737aa80d6e8621235ee554186f0/Policies/OmniReset/state_based_experts/cupcake_state_rl_expert_seed42.pt",
+          "sha256": "21fd0f72620eb0c5f4d160047e258ed5d33ee2d998e0bf2ca95871812fe8c6ed",
+          "bytes": 4720923
+        }
+      },
+      "cases": {
+        "peg": {
+          "variant": "candidate",
+          "task": "peg",
+          "initial_joint_sha256": "eb2dd01e342b50f526a239b852b510e8a1398a5b5ac813c7cc00cb149c333df7",
+          "initial_object_sha256": "a2e081153c0428bec35db15990e0258e769285d784caaf1d694f633a3056e3ef",
+          "episodes": 128,
+          "successes": 0,
+          "seed": 20261014,
+          "control_steps": 160,
+          "seconds": 54.83635030098958,
+          "reset_distribution": "ObjectAnywhereEEAnywhere (Reaching)",
+          "knuckles_after_randomization": {
+            "left_outer_knuckle": {
+              "mass_kg": 0.009324928745627403,
+              "diagonal_inertia_kg_m2": [
+                3.159325160595472e-06,
+                2.044269194811932e-06,
+                1.3336942856767564e-06
+              ]
+            },
+            "right_outer_knuckle": {
+              "mass_kg": 0.010898659005761147,
+              "diagonal_inertia_kg_m2": [
+                3.6925114272889914e-06,
+                2.3892719127616147e-06,
+                1.5587763755320339e-06
+              ]
+            }
+          },
+          "first_episode_success_by_env": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+          "timeouts": 106
+        },
+        "leg": {
+          "variant": "candidate",
+          "task": "leg",
+          "initial_joint_sha256": "63ce7643158af13cb9814942beb0b8140c49f0e2da56f47c1a229b7923736f69",
+          "initial_object_sha256": "8415375fe87ae139c2125c1a8f8e95c05be5d992bf04cb833c48b8b857d694b8",
+          "episodes": 128,
+          "successes": 0,
+          "seed": 20261014,
+          "control_steps": 160,
+          "seconds": 54.44803748499544,
+          "reset_distribution": "ObjectAnywhereEEAnywhere (Reaching)",
+          "knuckles_after_randomization": {
+            "left_outer_knuckle": {
+              "mass_kg": 0.009324928745627403,
+              "diagonal_inertia_kg_m2": [
+                3.159325160595472e-06,
+                2.044269194811932e-06,
+                1.3336942856767564e-06
+              ]
+            },
+            "right_outer_knuckle": {
+              "mass_kg": 0.010898659005761147,
+              "diagonal_inertia_kg_m2": [
+                3.6925114272889914e-06,
+                2.3892719127616147e-06,
+                1.5587763755320339e-06
+              ]
+            }
+          },
+          "first_episode_success_by_env": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+          "timeouts": 110
+        },
+        "drawer": {
+          "variant": "candidate",
+          "task": "drawer",
+          "initial_joint_sha256": "d24b1c97f2526c1fe6c89a38581535a5a5d5af0dc6736e2c9a3cba478b91cb60",
+          "initial_object_sha256": "9a754e4d01a25417786ebf673c1330a7b8633b937b0dad3d8b9cdfeed46e0130",
+          "episodes": 128,
+          "successes": 0,
+          "seed": 20261014,
+          "control_steps": 160,
+          "seconds": 39.300617743996554,
+          "reset_distribution": "ObjectAnywhereEEAnywhere (Reaching)",
+          "knuckles_after_randomization": {
+            "left_outer_knuckle": {
+              "mass_kg": 0.009324928745627403,
+              "diagonal_inertia_kg_m2": [
+                3.159325160595472e-06,
+                2.044269194811932e-06,
+                1.3336942856767564e-06
+              ]
+            },
+            "right_outer_knuckle": {
+              "mass_kg": 0.010898659005761147,
+              "diagonal_inertia_kg_m2": [
+                3.6925114272889914e-06,
+                2.3892719127616147e-06,
+                1.5587763755320339e-06
+              ]
+            }
+          },
+          "first_episode_success_by_env": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+          "timeouts": 104
+        },
+        "cube": {
+          "variant": "candidate",
+          "task": "cube",
+          "initial_joint_sha256": "3031fd549967b18a230d8ebfdd52ca60885b01d06b6af871b40b4249cb91e19e",
+          "initial_object_sha256": "2ede596c1bc70a04d5c1b7611ddaaa4b5af8e0aa03d80562a198e9980ce04370",
+          "episodes": 128,
+          "successes": 0,
+          "seed": 20261014,
+          "control_steps": 160,
+          "seconds": 34.90067664200615,
+          "reset_distribution": "ObjectAnywhereEEAnywhere (Reaching)",
+          "knuckles_after_randomization": {
+            "left_outer_knuckle": {
+              "mass_kg": 0.009324928745627403,
+              "diagonal_inertia_kg_m2": [
+                3.159325160595472e-06,
+                2.044269194811932e-06,
+                1.3336942856767564e-06
+              ]
+            },
+            "right_outer_knuckle": {
+              "mass_kg": 0.010898659005761147,
+              "diagonal_inertia_kg_m2": [
+                3.6925114272889914e-06,
+                2.3892719127616147e-06,
+                1.5587763755320339e-06
+              ]
+            }
+          },
+          "first_episode_success_by_env": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+          "timeouts": 110
+        },
+        "cupcake": {
+          "variant": "candidate",
+          "task": "cupcake",
+          "initial_joint_sha256": "8cf5354dc9bfeb710b0ecc86184b4ac39e701dfaa9cf992d23bf4afa658a6452",
+          "initial_object_sha256": "1bf357bd024092af9780bc0b2577ce1ff9f0d9b82662ed7cdebf48a440c56ed1",
+          "episodes": 128,
+          "successes": 0,
+          "seed": 20261014,
+          "control_steps": 160,
+          "seconds": 42.674745777010685,
+          "reset_distribution": "ObjectAnywhereEEAnywhere (Reaching)",
+          "knuckles_after_randomization": {
+            "left_outer_knuckle": {
+              "mass_kg": 0.009324928745627403,
+              "diagonal_inertia_kg_m2": [
+                3.159325160595472e-06,
+                2.044269194811932e-06,
+                1.3336942856767564e-06
+              ]
+            },
+            "right_outer_knuckle": {
+              "mass_kg": 0.010898659005761147,
+              "diagonal_inertia_kg_m2": [
+                3.6925114272889914e-06,
+                2.3892719127616147e-06,
+                1.5587763755320339e-06
+              ]
+            }
+          },
+          "first_episode_success_by_env": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+          "timeouts": 108
+        }
+      },
+      "comparison": {
+        "peg": {
+          "original": 125,
+          "previous_candidate": 0,
+          "with_knuckle_fix": 0,
+          "initial_states_match": true
+        },
+        "leg": {
+          "original": 118,
+          "previous_candidate": 0,
+          "with_knuckle_fix": 0,
+          "initial_states_match": true
+        },
+        "drawer": {
+          "original": 0,
+          "previous_candidate": 0,
+          "with_knuckle_fix": 0,
+          "initial_states_match": true
+        },
+        "cube": {
+          "original": 118,
+          "previous_candidate": 0,
+          "with_knuckle_fix": 0,
+          "initial_states_match": true
+        },
+        "cupcake": {
+          "original": 124,
+          "previous_candidate": 52,
+          "with_knuckle_fix": 0,
+          "initial_states_match": true
+        }
+      }
+    }
+  },
+  "native_readbacks": {
+    "left_outer_knuckle": {
+      "mass_kg": 0.00853000022470951,
+      "inertia_kg_m2": [
+        2.8899999051645864e-06,
+        0.0,
+        0.0,
+        0.0,
+        1.8699998918236815e-06,
+        0.0,
+        0.0,
+        0.0,
+        1.2199999446238508e-06
+      ]
+    },
+    "right_outer_knuckle": {
+      "mass_kg": 0.00853000022470951,
+      "inertia_kg_m2": [
+        2.8899999051645864e-06,
+        0.0,
+        0.0,
+        0.0,
+        1.8699998918236815e-06,
+        0.0,
+        0.0,
+        0.0,
+        1.2199999446238508e-06
+      ]
+    }
+  },
+  "finger_position_rad": {
+    "open": -4.961087642177961e-15,
+    "close": 0.7789466381072998,
+    "reopen": 2.872927871067077e-05
+  },
+  "candidate_usda_sha256": "9b7ca67f2e2cc49c3937264d0056e4b7233b1bcf8b2de53cd6476a78f9ea3b1b"
+}

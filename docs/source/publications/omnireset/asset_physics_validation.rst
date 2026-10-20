@@ -1,7 +1,7 @@
 .. _ur5e-asset-physics-validation:
 
-UR5e camera and mimic candidate
-==============================
+UR5e camera, mimic, and knuckle candidate
+========================================
 
 The combined physics candidate is **experimental and opt-in**. It does not preserve
 released-checkpoint performance. Existing robot configurations keep their original
@@ -18,18 +18,76 @@ Changes
   (1 mg). Its dimensions and pose are unchanged.
 * The physical ``D415_to_Robotiq_Mount`` collider gets mass 0.030 kg (30 g).
   PhysX estimates its center of mass and inertia from its collision geometry.
-* Outer-knuckle mass/inertia remains unchanged; issue #40 is not addressed.
+* Both outer-knuckle **rigid-body prims** now have mass 0.00853 kg (8.53 g)
+  and diagonal inertia (2.89e-6, 1.87e-6, 1.22e-6) kg m^2. These values are
+  copied exactly from factory_v2 asset revision
+  ``975b2393654e72157301942ca598ddacdd23970d`` and address issue #40.
+  Joint armature is unchanged; no other factory_v2 settings are imported.
 
-Native Isaac Sim 5.1 readbacks confirmed 0.639892 kg for the gripper base.
-Deactivating the safety collider removes approximately 1 mg; deactivating the
-physical mount removes 30 g. The free-space finger reaches 0.779264 rad for a
-0.785398 rad close command and returns near zero when reopened. Finite-limit
-startup errors disappear. The knuckles retain their 1 kg / 0.004 kg m^2 fallback.
+Native Isaac Sim 5.1 readbacks confirm both knuckles use the explicit 8.53 g
+mass and the exact factory_v2 diagonal inertia. The fallback warnings disappear.
+The free-space finger reaches 0.778947 rad for a 0.785398 rad close command and
+returns near zero when reopened. The camera masses and other physics settings
+are preserved from the previous candidate.
 
-Checkpoint compatibility
-------------------------
+Knuckle-fix checkpoint comparison
+--------------------------------
 
-Measured on 2026-10-19 with an RTX PRO 6000. Each cell scores exactly the first
+The new candidate was evaluated on the same five tasks and frozen seed42
+checkpoints as the previous candidate, with 128 first episodes per task/runtime,
+seed 20261014, Reaching resets, and a 16-second horizon. Initial robot/object
+state hashes match both previous candidate and original runs in every comparison.
+Original and previous-candidate measurements below are reused from the prior
+validation; only the changed candidate was rerun. Rectangle/wall is excluded.
+
+.. list-table:: Successful first episodes out of 128, before and after adding #40
+   :header-rows: 1
+
+   * - Task
+     - Sim 5.1 previous candidate
+     - Sim 5.1 with #40
+     - Lab 3 previous candidate
+     - Lab 3 with #40
+   * - Peg
+     - 107
+     - 20
+     - 0
+     - 0
+   * - Leg / tabletop
+     - 52
+     - 0
+     - 0
+     - 0
+   * - Drawer
+     - 126
+     - 13
+     - 0
+     - 0
+   * - Cube
+     - 112
+     - 61
+     - 0
+     - 0
+   * - Cupcake / plate
+     - 102
+     - 31
+     - 52
+     - 0
+
+Correcting the native mass properties does **not** establish compatibility with
+existing checkpoints or resolve the functional policy failures in #46. The
+candidate remains opt-in and production defaults remain unchanged.
+
+Native readbacks, per-environment success flags, checkpoint identities, and
+paired initial-state hashes are available in
+:download:`knuckle_physics_validation.json <knuckle_physics_validation.json>`.
+The reproduction command below now evaluates this updated candidate.
+
+Previous camera/mimic-only validation
+-------------------------------------
+
+The following historical results are for commit ``165aac0``, before the knuckle
+fix. Measured on 2026-10-19 with an RTX PRO 6000. Each cell scores exactly the first
 128 episodes, seed 20261014, Reaching resets (ObjectAnywhereEEAnywhere), 160 control
 steps / 16 seconds, with the standard evaluation randomizations. Every paired
 run has identical initial robot and object state hashes. Success is sampled from

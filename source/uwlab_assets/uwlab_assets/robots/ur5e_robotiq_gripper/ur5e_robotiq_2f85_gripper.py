@@ -76,7 +76,7 @@ def spawn_ur5e_without_physics_materials(prim_path, cfg, translation=None, orien
 
 
 def spawn_ur5e_with_candidate_physics(prim_path, cfg, translation=None, orientation=None):
-    """Opt in to #46 mimic corrections and 30 g camera / 1 mg clearance masses.
+    """Opt in to mimic corrections, camera masses, and factory_v2 knuckle properties.
 
     This candidate changes checkpoint behavior, including regressions on Isaac
     Lab 3. Keep existing configurations on the original spawner until retraining
