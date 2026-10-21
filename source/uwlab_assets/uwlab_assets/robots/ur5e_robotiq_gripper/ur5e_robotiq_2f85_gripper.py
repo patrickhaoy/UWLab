@@ -21,7 +21,12 @@ from isaaclab.assets.articulation import ArticulationCfg
 
 from uwlab_assets import UWLAB_CLOUD_ASSETS_DIR
 
-from .usd_physics import apply_ur5e_mass_corrections, apply_ur5e_physics_corrections
+from .usd_physics import (
+    apply_ur5e_camera_mount_mass,
+    apply_ur5e_mass_corrections,
+    apply_ur5e_physics_corrections,
+    remove_ur5e_passive_mimics,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -94,6 +99,24 @@ def spawn_ur5e_with_mass_corrections(prim_path, cfg, translation=None, orientati
     prim = spawn_ur5e_without_physics_materials(prim_path, cfg, translation, orientation)
     for root in sim_utils.find_matching_prims(prim_path) or [prim]:
         apply_ur5e_mass_corrections(root)
+    return prim
+
+
+def spawn_ur5e_with_camera_mount_mass(prim_path, cfg, translation=None, orientation=None):
+    """Set the physical camera mount to 30 g while retaining authored robot physics."""
+    prim = spawn_ur5e_without_physics_materials(prim_path, cfg, translation, orientation)
+    for root in sim_utils.find_matching_prims(prim_path) or [prim]:
+        apply_ur5e_camera_mount_mass(root)
+    return prim
+
+
+def spawn_ur5e_with_camera_mount_mass_and_passive_mimic_cleanup(
+    prim_path, cfg, translation=None, orientation=None
+):
+    """Set the mount to 30 g and remove passive mimic rules; preserve authored armature."""
+    prim = spawn_ur5e_with_camera_mount_mass(prim_path, cfg, translation, orientation)
+    for root in sim_utils.find_matching_prims(prim_path) or [prim]:
+        remove_ur5e_passive_mimics(root)
     return prim
 
 

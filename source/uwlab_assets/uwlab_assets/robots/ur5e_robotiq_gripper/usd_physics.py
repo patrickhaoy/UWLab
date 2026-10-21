@@ -55,6 +55,23 @@ def apply_ur5e_physics_corrections(root):
     ineffective visual-mesh properties and PhysX's 1 kg sphere fallback. Joint
     armature is deliberately not imported from factory_v2.
     """
+    remove_ur5e_passive_mimics(root)
+    apply_ur5e_mass_corrections(root)
+
+
+def apply_ur5e_camera_mount_mass(root):
+    """Set only the physical camera mount to 30 g; preserve all other USD physics."""
+    from pxr import UsdPhysics
+
+    path = root.GetPath().AppendPath("robotiq_base_link/collisions/D415_to_Robotiq_Mount")
+    prim = root.GetStage().GetPrimAtPath(path)
+    if not prim.IsValid():
+        raise ValueError(f"UR5e camera mass correction requires {path}")
+    UsdPhysics.MassAPI.Apply(prim).CreateMassAttr(0.030)
+
+
+def remove_ur5e_passive_mimics(root):
+    """Remove four redundant passive mimic rules, preserving joints and armature."""
     from pxr import Sdf
 
     passive_joints = (
@@ -81,4 +98,3 @@ def apply_ur5e_physics_corrections(root):
         prim.GetAttribute("physxMimicJoint:rotZ:gearing").Block()
         prim.GetAttribute("physxMimicJoint:rotZ:offset").Block()
         prim.GetRelationship("physxMimicJoint:rotZ:referenceJoint").SetTargets([])
-    apply_ur5e_mass_corrections(root)
