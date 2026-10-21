@@ -1,7 +1,40 @@
 # Copyright (c) 2024-2026, The UW Lab Project Developers.
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Physics corrections for the released calibrated UR5e/Robotiq USD."""
+"""Opt-in physics corrections for the released calibrated UR5e/Robotiq USD."""
+
+
+def apply_ur5e_mass_corrections(root):
+    """Correct camera and outer-knuckle masses without changing gripper mimics.
+
+    Keep the enlarged safety collider enabled at 1 mg and assign the physical
+    camera mount 30 g. Copy factory_v2's mass and diagonal inertia to the two
+    outer-knuckle rigid bodies. Joint limits, mimics, and armature stay authored
+    exactly as in the released USD.
+    """
+    from pxr import Gf, UsdPhysics
+
+    stage = root.GetStage()
+    colliders = {
+        "robotiq_base_link/collisions/d415_and_cable": 1.0e-6,
+        "robotiq_base_link/collisions/D415_to_Robotiq_Mount": 0.030,
+    }
+    prims = {path: stage.GetPrimAtPath(root.GetPath().AppendPath(path)) for path in colliders}
+    knuckles = {
+        name: stage.GetPrimAtPath(root.GetPath().AppendChild(name))
+        for name in ("left_outer_knuckle", "right_outer_knuckle")
+    }
+    for name, prim in {**prims, **knuckles}.items():
+        if not prim.IsValid():
+            raise ValueError(f"UR5e mass corrections require {root.GetPath()}/{name}")
+    for path, mass in colliders.items():
+        UsdPhysics.MassAPI.Apply(prims[path]).CreateMassAttr(mass)
+    # factory_v2 asset revision 975b2393654e72157301942ca598ddacdd23970d.
+    # Author on the actual rigid-body prims, not their visual meshes.
+    for prim in knuckles.values():
+        mass_api = UsdPhysics.MassAPI.Apply(prim)
+        mass_api.CreateMassAttr(0.00853)
+        mass_api.CreateDiagonalInertiaAttr(Gf.Vec3f(2.89e-6, 1.87e-6, 1.22e-6))
 
 
 def apply_ur5e_physics_corrections(root):
@@ -22,7 +55,7 @@ def apply_ur5e_physics_corrections(root):
     ineffective visual-mesh properties and PhysX's 1 kg sphere fallback. Joint
     armature is deliberately not imported from factory_v2.
     """
-    from pxr import Gf, Sdf, UsdPhysics
+    from pxr import Sdf
 
     passive_joints = (
         "left_inner_knuckle_joint",
@@ -32,16 +65,7 @@ def apply_ur5e_physics_corrections(root):
     )
     stage = root.GetStage()
     joints = {name: stage.GetPrimAtPath(root.GetPath().AppendChild(name)) for name in passive_joints}
-    colliders = {
-        "robotiq_base_link/collisions/d415_and_cable": 1.0e-6,
-        "robotiq_base_link/collisions/D415_to_Robotiq_Mount": 0.030,
-    }
-    prims = {path: stage.GetPrimAtPath(root.GetPath().AppendPath(path)) for path in colliders}
-    knuckles = {
-        name: stage.GetPrimAtPath(root.GetPath().AppendChild(name))
-        for name in ("left_outer_knuckle", "right_outer_knuckle")
-    }
-    for name, prim in {**joints, **prims, **knuckles}.items():
+    for name, prim in joints.items():
         if not prim.IsValid():
             raise ValueError(f"UR5e physics corrections require {root.GetPath()}/{name}")
     for prim in joints.values():
@@ -57,11 +81,4 @@ def apply_ur5e_physics_corrections(root):
         prim.GetAttribute("physxMimicJoint:rotZ:gearing").Block()
         prim.GetAttribute("physxMimicJoint:rotZ:offset").Block()
         prim.GetRelationship("physxMimicJoint:rotZ:referenceJoint").SetTargets([])
-    for path, mass in colliders.items():
-        UsdPhysics.MassAPI.Apply(prims[path]).CreateMassAttr(mass)
-    # factory_v2 asset revision 975b2393654e72157301942ca598ddacdd23970d.
-    # Author on the actual rigid-body prims, not their visual meshes.
-    for prim in knuckles.values():
-        mass_api = UsdPhysics.MassAPI.Apply(prim)
-        mass_api.CreateMassAttr(0.00853)
-        mass_api.CreateDiagonalInertiaAttr(Gf.Vec3f(2.89e-6, 1.87e-6, 1.22e-6))
+    apply_ur5e_mass_corrections(root)

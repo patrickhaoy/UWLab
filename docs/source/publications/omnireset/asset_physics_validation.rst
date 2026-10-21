@@ -168,6 +168,22 @@ Hugging Face USD and the cache are not modified. To select it deliberately:
 
    env_cfg.scene.robot.spawn.func = spawn_ur5e_with_candidate_physics
 
+For a **mass-only training ablation**, keep the released USD's passive mimic
+rules, joint limits, and armature while applying only the safety-collider,
+camera-mount, and outer-knuckle mass/inertia changes above:
+
+.. code-block:: python
+
+   from uwlab_assets.robots.ur5e_robotiq_gripper.ur5e_robotiq_2f85_gripper import (
+       spawn_ur5e_with_mass_corrections,
+   )
+
+   env_cfg.scene.robot.spawn.func = spawn_ur5e_with_mass_corrections
+
+The original passive-mimic finite-limit parser errors remain in Isaac Sim 6.1
+for this ablation; no mimic rule is removed or altered. This variant isolates
+the mass changes from the combined candidate and is opt-in.
+
 To repeat a Lab 3 comparison from the repository in the configured Isaac Lab 3
 environment (repeat for leg, drawer, cube, and cupcake):
 

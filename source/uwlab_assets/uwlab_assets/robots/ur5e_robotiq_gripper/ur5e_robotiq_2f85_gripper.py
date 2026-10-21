@@ -21,7 +21,7 @@ from isaaclab.assets.articulation import ArticulationCfg
 
 from uwlab_assets import UWLAB_CLOUD_ASSETS_DIR
 
-from .usd_physics import apply_ur5e_physics_corrections
+from .usd_physics import apply_ur5e_mass_corrections, apply_ur5e_physics_corrections
 
 logger = logging.getLogger(__name__)
 
@@ -86,6 +86,14 @@ def spawn_ur5e_with_candidate_physics(prim_path, cfg, translation=None, orientat
     prim = spawn_ur5e_without_physics_materials(prim_path, cfg, translation, orientation)
     for root in sim_utils.find_matching_prims(prim_path) or [prim]:
         apply_ur5e_physics_corrections(root)
+    return prim
+
+
+def spawn_ur5e_with_mass_corrections(prim_path, cfg, translation=None, orientation=None):
+    """Opt in to camera and knuckle mass corrections with original gripper mimics."""
+    prim = spawn_ur5e_without_physics_materials(prim_path, cfg, translation, orientation)
+    for root in sim_utils.find_matching_prims(prim_path) or [prim]:
+        apply_ur5e_mass_corrections(root)
     return prim
 
 
